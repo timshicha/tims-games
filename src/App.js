@@ -1,4 +1,5 @@
 import './App.css';
+import {findPaths} from './path-alg';
 
 function App() {
 
@@ -46,7 +47,7 @@ function App() {
     function clicked(obj, x, y) {
       obj.classList = 'circle-btn circle-btn-blue';
       gameBoard[x][y] = 1;
-      console.log(gameBoard);
+      console.log("Paths that were found:", findPaths(gameBoard, [x, y]));
     }
 
     function createClickableCircle(x, y, x_coords = 0, y_coords = 0) {
@@ -91,7 +92,6 @@ function App() {
         <div className="g-area">
           <canvas width={scale * size} height={scale * size} className='g-canvas' id='g-canvas' />
           <div className="g-div" id="g-div"></div>
-          {/* <div className='clickable-circle'/> */}
         </div>
       </div>
     </>

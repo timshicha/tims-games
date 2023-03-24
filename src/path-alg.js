@@ -12,11 +12,12 @@ const nextLeftNeighbor = (rotation) => {
     if (cmp(rotation, [1, 0])) return [1, -1];
     if (cmp(rotation, [1, -1])) return [0, -1];
     if (cmp(rotation, [0, -1])) return [-1, -1];
-    console.log("ERROR: nextLeftNeighbor");
+    console.log("ERROR: nextLeftNeighbor (rotation:", rotation, ")");
 }
 
 // Get all neighboring coordinates in order
 const getAllNeighborsInOrder = (matrix, pos, prevPos = null) => {
+    // console.log("pos:", pos, prevPos);
     let neighbors = [];
     let rotation = [-1, -1];
     if (prevPos) {
@@ -223,13 +224,58 @@ const createPathMatrix = (matrix, startPos) => {
     return fillMatrix(pathMatrix);
 }
 
+const findLeftMostPath = (matrix) => {
+    const findTopLeft = (matrix) => {
+        for (let i = 0; i < matrix.length; i++) {
+            for (let j = 0; j < matrix[0].length; j++) {
+                if (matrix[i][j] === 1) {
+                    return [i, j];
+                }
+            }
+        }
+        return null;
+    }
+    // Find the top-left dot
+    let topLeft = findTopLeft(matrix);
+    if (topLeft === null) {
+        return null;
+    }
+
+    let path = [[topLeft[0], topLeft[1]]];
+    let prev = [topLeft[0] - 1, topLeft[1] + 1];
+    console.log("Current:", topLeft, "Previous:", prev);
+    let current = findNeighborsInOrder(matrix, topLeft, prev)[0];
+    prev = topLeft;
+
+    // Until we reach out starting point
+    while (current && !cmp(current, topLeft)) {
+        path.push(current);
+        console.log("Current:", current, "Previous:", prev);
+        let newCurrent = findNeighborsInOrder(matrix, current, prev)[0];
+        prev = current;
+        current = newCurrent;
+    }
+    // If could not find path
+    if (!current) {
+        return null;
+    }
+    path.push(current);
+    return path;
+}
+
 const findPathAndMatrix = (matrix, startPos) => {
-    // Get the paths
-    let paths = findPaths(matrix, startPos);
-    // Find the upper-left most dot
-    let upperLeft = null;
+    let pathMatrix = createPathMatrix(matrix, startPos);
+    if (pathMatrix === null) {
+        return null;
+    }
+    let topLeft = findLeftMostPath(pathMatrix);
+    if (topLeft === null) {
+        return null;
+    }
+    let leftMostPath = findLeftMostPath(matrix);
+    return leftMostPath;
 }
 
 
-module.exports = { findPaths, createPathMatrix };
+module.exports = { findPaths, createPathMatrix, findPathAndMatrix };
 

@@ -1,5 +1,5 @@
 import './App.css';
-import {findPaths, createPathMatrix} from './path-alg';
+import {findPaths, createPathMatrix, findPathAndMatrix} from './path-alg';
 
 function App() {
 
@@ -60,24 +60,26 @@ function App() {
     function clicked(obj, x, y) {
       obj.classList = 'circle-btn circle-btn-blue';
       gameBoard[x][y] = 1;
-      let paths = findPaths(gameBoard, [x, y]);
-      let pathMatrix = createPathMatrix(gameBoard, [x, y]);
-      console.log("Path matrix:", pathMatrix);
-      console.log("Paths that were found:", paths);
-      for (let i = 0; i < paths.length; i++) {
-        drawCanvasPath(paths[i]);
+      // let paths = findPaths(gameBoard, [x, y]);
+      // let pathMatrix = createPathMatrix(gameBoard, [x, y]);
+      // console.log("Path matrix:", pathMatrix);
+      let path = findPathAndMatrix(gameBoard, [x, y]);
+      console.log("Path that was found:", path);
+      if(path) {
+        drawCanvasPath(path);
       }
-      // Fill in board
-      if (pathMatrix) {
-        for (let i = 0; i < size - 1; i++) {
-          for (let j = 0; j < size - 1; j++) {
-            // console.log("look:",pathMatrix, i, j);
-            if (pathMatrix[i][j] === 1) {
-              uiBoard[i][j].classList = 'circle-btn circle-btn-blue';
-            }
-          }
-        }
-      }
+      // // Fill in board
+      // if (pathMatrix) {
+      //   for (let i = 0; i < size - 1; i++) {
+      //     for (let j = 0; j < size - 1; j++) {
+      //       // console.log("look:",pathMatrix, i, j);
+      //       if (pathMatrix[i][j] === 1) {
+      //         uiBoard[i][j].classList = 'circle-btn circle-btn-blue';
+      //         gameBoard[i][j] = 1;
+      //       }
+      //     }
+      //   }
+      // }
     }
 
     function createClickableCircle(x, y, x_coords = 0, y_coords = 0) {

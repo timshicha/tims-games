@@ -266,14 +266,10 @@ const findLeftMostPath = (matrix) => {
 const findPathAndMatrix = (matrix, startPos) => {
     let pathMatrix = createPathMatrix(matrix, startPos);
     if (pathMatrix === null) {
-        return null;
+        return [null, null];
     }
-    let topLeft = findLeftMostPath(pathMatrix);
-    if (topLeft === null) {
-        return null;
-    }
-    let leftMostPath = findLeftMostPath(matrix);
-    return leftMostPath;
+    let leftMostPath = findLeftMostPath(pathMatrix);
+    return [leftMostPath, pathMatrix];
 }
 
 

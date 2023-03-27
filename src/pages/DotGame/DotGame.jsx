@@ -182,7 +182,7 @@ function DotGame() {
   }
 
   function testServer() {
-    fetch("http://localhost:3000/api/test").then(res => res.text()).then((res) => {
+    fetch(process.env.REACT_APP_API_BASE_URL + "/api/test").then(res => res.text()).then((res) => {
       alert(res);
     }).catch((err) => {
       alert("Failed to reach server");

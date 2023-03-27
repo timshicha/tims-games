@@ -182,7 +182,7 @@ function DotGame() {
   }
 
   function testServer() {
-    fetch("http://localhost:3000/").then(res => res.text()).then((res) => {
+    fetch("http://localhost:3000/api/test").then(res => res.text()).then((res) => {
       alert(res);
     }).catch((err) => {
       alert("Failed to reach server");
@@ -201,7 +201,7 @@ function DotGame() {
         <p>You can win in the following ways:</p>
         <ul>
           <li>Control 25% of the territory first (your current territory: {Math.round(playerTerritory * 100 / maxTerritory * 100) / 100}%)</li>
-          <li>Control 15 more units than your opponent (you control: {playerTerritory})</li>
+          <li>Control 20 more units than your opponent (you control: {playerTerritory})</li>
           <li>Control more territory once all dots have been filled</li>
         </ul>
         <div className="g-area">

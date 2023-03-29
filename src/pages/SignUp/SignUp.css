@@ -3,6 +3,7 @@
 /* Make a wipe appearance by placing them into view using the three classes below */
 
 .signup-div-show {
+    display: block;
     margin-left: 0%;
 }
 
@@ -14,10 +15,15 @@
     margin-left: 150%;
 }
 
+.signup-hidden {
+    opacity: 0;
+}
+
 .signup-div-container {
     position: relative;
     overflow: hidden;
-    height: 650px;
+    height: fit-content;
+    min-height: 600px;
     box-sizing: content-box;
     background-color: #98a3fa;
     border-radius: 10px;
@@ -25,8 +31,40 @@
     margin-left: auto;
     margin-right: auto;
     margin-top: 30px;
+    transition: background-color 3s;
 }
 
+.signup-div-container-success {
+    background-color: #9012ea;
+}
+
+.signup-success-div {
+    position: absolute;
+    width: 90%;
+    height: 300px;
+    left: 5%;
+    text-align: center;
+    top: calc(50% - 150px);
+    display: default;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 2s ease-in;
+}
+
+.signup-success-div-show {
+    pointer-events: initial;
+    opacity: 1;
+}
+
+.signup-success-div > .signup-success-text {
+    text-align: left;
+}
+
+.signup-success-title {
+    color: white;
+    font: bold 28px Arial;
+    margin-top: 35px;
+}
 
 .signup-div {
     position: absolute;
@@ -37,6 +75,9 @@
     transition: margin-left 0.2s;
 }
 
+.signup-space-above {
+    margin-top: 80px;
+}
 
 .signup-form {
     text-align: center;
@@ -138,6 +179,25 @@
 
 .text-button:hover {
     color: red;
+}
+
+
+.signup-success-text {
+    color: white;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+@media (max-width: 340px) {
+    .signup-div-container {
+        height: 650px;
+    }
+}
+
+@media (min-width: 340px) and (max-width: 440px) {
+    .signup-div-container {
+        height: 625px;
+    }
 }
 
 /* Smaller screens */

@@ -8,6 +8,8 @@ const SignUp = () => {
     const [emailClassName, setEmailClassName] = useState("signup-div-show");
     const [codeClassName, setCodeClassName] = useState("signup-div-hidden-right");
     const [userPassClassName, setUserPassClassName] = useState("signup-div-hidden-right");
+    const [signupDivClassName, setSignupDivClassName] = useState("");
+    const [signupSuccessDivClassName, setSignupSuccessDivClassName] = useState("");
     const [emailErrorMsg, setEmailErrorMsg] = useState(null);
     const [codeErrorMsg, setCodeErrorMsg] = useState(null);
     const [userPassErrorMsg, setUserPassErrorMsg] = useState(null);
@@ -48,24 +50,31 @@ const SignUp = () => {
         event.preventDefault();
         let email = event.target.email.value;
 
-        await fetch(process.env.REACT_APP_API_BASE_URL + "/api/users/create-account-send-email", {
-            method: "POST",
-            body: JSON.stringify({ email: email }),
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }
-        }).then(res => res.json()).then(res => {
-            // If successful, wipe in code page
-            if (res.success === true) {
-                setAccountCreationID(res.accountCreationID);
-                showCodeDiv();
-            }
-            else {
-                setEmailErrorMsg(res.reason);
-            }
-            console.log(res);
-        });
+        if (email === "") {
+            setEmailErrorMsg("Please enter an email.");
+        }
+        else {
+            await fetch(process.env.REACT_APP_API_BASE_URL + "/api/users/create-account-send-email", {
+                method: "POST",
+                body: JSON.stringify({ email: email }),
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                }
+            }).then(res => res.json()).then(res => {
+                // If successful, wipe in code page
+                if (res.success === true) {
+                    setAccountCreationID(res.accountCreationID);
+                    showCodeDiv();
+                }
+                else {
+                    setEmailErrorMsg(res.reason);
+                }
+                console.log(res);
+            }).catch((err) => {
+                setEmailErrorMsg("Server error. This may have happened if you sent too many requests too quickly. Please try waiting for one minute before trying again.");
+            });
+        }
         setEmailLoading(false);
     }
 
@@ -140,7 +149,10 @@ const SignUp = () => {
                 }
             }).then(res => res.json()).then(res => {
                 if (res.success) {
-                    alert("account created");
+                    event.target.username.value = "";
+                    event.target.password.value = "";
+                    event.target.confirmPassword.value = "";
+                    successfulLoginTransform();
                 }
                 else {
                     setUserPassErrorMsg(res.reason);
@@ -151,31 +163,34 @@ const SignUp = () => {
         setUserPassLoading(false);
     }
 
+    const successfulLoginTransform = () => {
+        setSignupDivClassName("signup-div-container-success");
+        setUserPassClassName("signup-div-show signup-hidden");
+        setTimeout(() => setSignupSuccessDivClassName("signup-success-div-show"), 1000);
+    }
+
     function toggle() {
-        if (codeClassName === "signup-div-show") {
+        console.log(userPassClassName);
+        if (userPassClassName !== "signup-div-show") {
             showUserPassDiv();
+            setSignupDivClassName("");
+            setSignupSuccessDivClassName("");
         }
         else {
-            showCodeDiv();
-        }
-        if (emailLoading === "true") {
-            setEmailLoading("false");
-        }
-        else {
-            setEmailLoading("true");
+            successfulLoginTransform();
         }
     }
 
     return (
         <>
 
-            <div className="signup-div-container">
+            <div className={"signup-div-container " + signupDivClassName}>
 
                 {/* PROVIDE EMAIL DIV */}
                 <div className={"signup-div " + emailClassName}>
                     <form className="signup-form" onSubmit={submitEmail}>
                         <p className="signup-title">Sign Up</p>
-                        <div className="signup-form-area">
+                        <div className="signup-form-area signup-space-above">
                             <p className="signup-error-msg signup-text-left">{emailErrorMsg}</p>
                             <label htmlFor="signup-email" className="signup-form-text signup-text-left">Enter your email:</label>
                             <input type="email" className="signup-input-field" id="signup-email" name="email" placeholder="example@email.com" />
@@ -191,7 +206,7 @@ const SignUp = () => {
                 <div className={"signup-div " + codeClassName}>
                     <form className="signup-form" onSubmit={submitCode}>
                         <p className="signup-title">Verify Email</p>
-                        <div className="signup-form-area">
+                        <div className="signup-form-area signup-space-above">
                             <p className="signup-error-msg signup-text-left">{codeErrorMsg}</p>
                             <p className="signup-form-text signup-text-left">A 6-digit verification code was sent to your email.</p>
                             <label htmlFor="signup-code" className="signup-form-text signup-text-left">Enter the verification code:</label>
@@ -222,8 +237,16 @@ const SignUp = () => {
                     </form>
                 </div>
 
+                <div className={"signup-success-div " + signupSuccessDivClassName}>
+                    <p className="signup-success-title">Congratulations!</p>
+                    <p className="signup-form-text signup-success-text">Your account was successfully created. You may now log in with your account.</p>
+                    <Link to="/">
+                        <GrayButton>Go To Home</GrayButton>
+                    </Link>
+                </div>
+
             </div>
-            <GrayButton onClick={toggle} loading={emailLoading.toString()} > Toggle</GrayButton >
+            {/* <GrayButton onClick={toggle} loading={emailLoading.toString()} > Toggle</GrayButton > */}
         </>
     );
 }

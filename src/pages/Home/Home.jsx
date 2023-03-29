@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { socket } from "../socket";
+// import { socket } from "../socket";
 
 function Home() {
 
@@ -65,6 +65,7 @@ function Home() {
     return (
         <>
             <p>Home</p>
+            <Link to="/signup">Login</Link><br />
             {/* <form> */}
             Create an account:<br />
             Username:<input type="text" id="username" /><br />

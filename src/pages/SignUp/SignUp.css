@@ -1,0 +1,160 @@
+
+/* Three divs wipe and hide: provide email, provide code, enter username and password */
+/* Make a wipe appearance by placing them into view using the three classes below */
+
+.signup-div-show {
+    margin-left: 0%;
+}
+
+.signup-div-hidden-left {
+    margin-left: -150%;
+}
+
+.signup-div-hidden-right {
+    margin-left: 150%;
+}
+
+.signup-div-container {
+    position: relative;
+    overflow: hidden;
+    height: 600px;
+    box-sizing: content-box;
+    background-color: #98a3fa;
+    border-radius: 10px;
+    border: 5px #787878 solid;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+}
+
+
+.signup-div {
+    position: absolute;
+    box-sizing: border-box;
+    height: 100%;
+    min-width: 100%;
+    top: 0px;
+    transition: margin-left 0.2s;
+}
+
+
+.signup-form {
+    text-align: center;
+    align-content: center;
+    margin: 10px;
+}
+
+.signup-title {
+    color: rgb(70, 70, 70);
+    font-weight: bold;
+    font-size: 30px;
+    margin-bottom: 35px;
+}
+
+.signup-form-text {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(70, 70, 70);
+    margin-bottom: 8px;
+    margin-top: 20px;
+}
+
+.signup-form-area {
+    display: block;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.signup-form-area > .signup-text-left {
+    text-align: left;
+}
+
+.signup-form-area > .code-input-field {
+    text-align: none;
+}
+
+.signup-error-msg {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(200, 0, 0);
+    margin-bottom: 20px;
+}
+
+.signup-input-field {
+    font-size: 22px;
+    font-weight: bold;
+    color: #464646;
+    letter-spacing: 0.5px;
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    border: 3px solid #787878;
+    padding: 10px 8px 10px 8px;
+    outline: none;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+.signup-input-field:focus {
+    border: 3px solid #5a5a5a;
+    background-color: white;
+}
+
+.signup-input-field::placeholder {
+    color: rgb(200, 200, 200);
+}
+
+.code-input-field {
+    width: 250px;
+    letter-spacing: 4px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.signup-submit-button {
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #464646;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 210px;
+    padding: 15px;
+    cursor: pointer;
+    margin-top: 35px;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+}
+
+.signup-submit-button:hover {
+    background-color: #323232;
+}
+
+.login-instead-div {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 15px;
+    text-align: center;
+}
+
+/* Smaller screens */
+@media (max-width: 600px) {
+    .signup-div-container {
+        width: 90%;
+        min-width: 280px;
+    }
+}
+
+/* Larger screens */
+@media (min-width: 600px) {
+    .signup-div-container {
+        width: 540px;
+    }
+}
+

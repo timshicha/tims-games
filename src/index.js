@@ -5,6 +5,7 @@ import './index.css';
 import Home from './pages/Home/Home';
 import DotGame from './pages/DotGame/DotGame';
 import reportWebVitals from './reportWebVitals';
+import SignUp from './pages/SignUp/SignUp';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -13,6 +14,7 @@ root.render(
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="dot-game" element={<DotGame />} />
+        <Route path="signup" element={<SignUp />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

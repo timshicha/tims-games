@@ -1,0 +1,29 @@
+
+.gray-button-component {
+    position: relative;
+    overflow: hidden;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #464646;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 15px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+}
+
+
+.gray-button-bg {
+    position: absolute;
+    height: 30px;
+    width: 30px;
+    background: url("../../assets/loading_circle.svg") 0 0 no-repeat;
+    background-size: 30px;
+    top: calc(50% - 15px);
+    left: calc(50% - 15px);
+}
+
+.gray-button-component:hover {
+    background-color: #323232;
+}

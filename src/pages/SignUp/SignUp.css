@@ -17,7 +17,7 @@
 .signup-div-container {
     position: relative;
     overflow: hidden;
-    height: 600px;
+    height: 650px;
     box-sizing: content-box;
     background-color: #98a3fa;
     border-radius: 10px;
@@ -48,7 +48,7 @@
     color: rgb(70, 70, 70);
     font-weight: bold;
     font-size: 30px;
-    margin-bottom: 35px;
+    margin-bottom: 25px;
 }
 
 .signup-form-text {
@@ -116,22 +116,9 @@
 }
 
 .signup-submit-button {
-    font-size: 18px;
-    font-weight: bold;
-    background-color: #464646;
-    color: white;
-    border: none;
-    border-radius: 5px;
     width: 210px;
-    padding: 15px;
-    cursor: pointer;
     margin-top: 35px;
     margin-bottom: 20px;
-    letter-spacing: 0.5px;
-}
-
-.signup-submit-button:hover {
-    background-color: #323232;
 }
 
 .login-instead-div {
@@ -141,6 +128,16 @@
     position: absolute;
     bottom: 15px;
     text-align: center;
+}
+
+.text-button {
+    color: blue;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.text-button:hover {
+    color: red;
 }
 
 /* Smaller screens */

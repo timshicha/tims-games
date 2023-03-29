@@ -1,6 +1,7 @@
 import "./SignUp.css";
-import { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import GrayButton from "../../components/GrayButton/GrayButton";
 
 const SignUp = () => {
 
@@ -11,11 +12,16 @@ const SignUp = () => {
     const [codeErrorMsg, setCodeErrorMsg] = useState(null);
     const [userPassErrorMsg, setUserPassErrorMsg] = useState(null);
     const [accountCreationID, setAccountCreationID] = useState(null);
+    const [emailLoading, setEmailLoading] = useState(false);
+    const [codeLoading, setCodeLoading] = useState(false);
+    const [userPassLoading, setUserPassLoading] = useState(false);
+    const codeRef = useRef(null);
 
     const showEmailDiv = () => {
         setEmailClassName("signup-div-show");
         setCodeClassName("signup-div-hidden-right");
         setUserPassClassName("signup-div-hidden-right");
+        codeRef.current.value = "";
         setCodeErrorMsg(null);
         setUserPassErrorMsg(null);
     }
@@ -32,11 +38,13 @@ const SignUp = () => {
         setEmailClassName("signup-div-hidden-left");
         setCodeClassName("signup-div-hidden-left");
         setUserPassClassName("signup-div-show");
+        codeRef.current.value = "";
         setEmailErrorMsg(null);
         setCodeErrorMsg(null);
     }
 
     const submitEmail = async (event) => {
+        setEmailLoading(true);
         event.preventDefault();
         let email = event.target.email.value;
 
@@ -58,9 +66,11 @@ const SignUp = () => {
             }
             console.log(res);
         });
+        setEmailLoading(false);
     }
 
     const submitCode = async (event) => {
+        setCodeLoading(true);
         event.preventDefault();
         let code = event.target.code.value;
 
@@ -80,16 +90,65 @@ const SignUp = () => {
                 setCodeErrorMsg(res.reason);
             }
         });
+        setCodeLoading(false);
     }
 
     const submitUserPass = async (event) => {
+        setUserPassLoading(true);
+        // Check if a username is legal. A username may only have
+        // letters, numbers, and underscores and must be between 1
+        // and 25 characters.
+        const checkValidUsername = (username) => {
+            if (username.length === 0 || username.length > 25) {
+                return false;
+            }
+            let notAllowed = /[^a-zA-Z0-9_]/;
+            return !notAllowed.test(username);
+        }
+
+        // Check if a password is legal. A password must be between
+        // 8 and 50 characters.
+        const checkValidPassword = (password) => {
+            if (password.length < 8 || password.length > 50) {
+                return false;
+            }
+            return true;
+        }
         event.preventDefault();
 
         let username = event.target.username.value;
         let password = event.target.password.value;
         let confirmPassword = event.target.confirmPassword.value;
 
-        console.log(username, password, confirmPassword);
+        if (!checkValidUsername(username)) {
+            setUserPassErrorMsg("Invalid username. Username may have letters, numbers, and underscores, and must be between 1 and 25 characters.");
+        }
+        else if (!checkValidPassword(password)) {
+            setUserPassErrorMsg("Invalid password. Password must be between 8 and 50 characters");
+        }
+        else if (password !== confirmPassword) {
+            setUserPassErrorMsg("Passwords do not match.");
+        }
+        else {
+            setUserPassErrorMsg(null);
+            fetch(process.env.REACT_APP_API_BASE_URL + "/api/users/create-account-username-password", {
+                method: "POST",
+                body: JSON.stringify({ "accountCreationID": accountCreationID, username: username, password: password}),
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                }
+            }).then(res => res.json()).then(res => {
+                if (res.success) {
+                    alert("account created");
+                }
+                else {
+                    setUserPassErrorMsg(res.reason);
+                }
+            });
+        }
+
+        setUserPassLoading(false);
     }
 
     function toggle() {
@@ -98,6 +157,12 @@ const SignUp = () => {
         }
         else {
             showCodeDiv();
+        }
+        if (emailLoading === "true") {
+            setEmailLoading("false");
+        }
+        else {
+            setEmailLoading("true");
         }
     }
 
@@ -113,12 +178,12 @@ const SignUp = () => {
                         <div className="signup-form-area">
                             <p className="signup-error-msg signup-text-left">{emailErrorMsg}</p>
                             <label htmlFor="signup-email" className="signup-form-text signup-text-left">Enter your email:</label>
-                            <input type="email" className="signup-input-field" id="signup-email" name="email" placeholder="example@email.com"/>
-                            <button type="submit" className="signup-submit-button">Send Code</button>
+                            <input type="email" className="signup-input-field" id="signup-email" name="email" placeholder="example@email.com" />
+                            <GrayButton type="submit" className="signup-submit-button" loading={emailLoading.toString()}>Send Code</GrayButton>
                         </div>
                     </form>
                     <div className="login-instead-div">
-                        <p className="signup-form-text login-instead-text">Already have an account? <Link to="/">Log in</Link> instead.</p>
+                        <p className="signup-form-text login-instead-text">Already have an account? <Link to="/" className="text-button">Log in</Link> instead.</p>
                     </div>
                 </div>
 
@@ -130,10 +195,13 @@ const SignUp = () => {
                             <p className="signup-error-msg signup-text-left">{codeErrorMsg}</p>
                             <p className="signup-form-text signup-text-left">A 6-digit verification code was sent to your email.</p>
                             <label htmlFor="signup-code" className="signup-form-text signup-text-left">Enter the verification code:</label>
-                            <input type="text" className="signup-input-field code-input-field" id="signup-code" name="code" placeholder="000000" maxLength={6}/>
-                            <button type="submit" className="signup-submit-button">Verify Code</button>
+                            <input ref={codeRef} type="text" className="signup-input-field code-input-field" id="signup-code" name="code" placeholder="000000" maxLength={6} />
+                            <GrayButton type="submit" className="signup-submit-button" loading={codeLoading.toString()}>Verify Code</GrayButton>
                         </div>
                     </form>
+                    <div className="login-instead-div">
+                        <p className="signup-form-text login-instead-text">Click <span onClick={showEmailDiv} className="text-button">here</span> to use a different email.</p>
+                    </div>
                 </div>
 
                 {/* USERNAME AND PASSWORD DIV */}
@@ -149,13 +217,13 @@ const SignUp = () => {
                             <input type="password" className="signup-input-field" id="signup-password" name="password" placeholder="Password" />
                             <label htmlFor="signup-confirm-password" className="signup-form-text signup-text-left">Confirm password:</label>
                             <input type="password" className="signup-input-field" id="signup-confirm-password" name="confirmPassword" placeholder="Confirm password" />
-                            <button type="submit" className="signup-submit-button">Create My Account</button>
+                            <GrayButton type="submit" className="signup-submit-button" loading={userPassLoading.toString()}>Create My Account</GrayButton>
                         </div>
                     </form>
                 </div>
 
             </div>
-            <button onClick={toggle}>Toggle</button>
+            <GrayButton onClick={toggle} loading={emailLoading.toString()} > Toggle</GrayButton >
         </>
     );
 }

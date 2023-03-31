@@ -150,6 +150,7 @@ const SignUp = () => {
             setUserPassErrorMsg(null);
             fetch(process.env.REACT_APP_API_BASE_URL + "/api/users/create-account-username-password", {
                 method: "POST",
+                credentials: "include",
                 body: JSON.stringify({ "accountCreationID": accountCreationID, username: username, password: password}),
                 headers: {
                     "Accept": "application/json",

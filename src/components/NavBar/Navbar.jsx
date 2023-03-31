@@ -48,6 +48,7 @@ const NavBar = () => {
 
             await fetch(process.env.REACT_APP_API_BASE_URL + "/api/sessions/create", {
                 method: "POST",
+                credentials: "include",
                 body: JSON.stringify({ "username": username, "password": password }),
                 headers: {
                     "Accept": "application/json",

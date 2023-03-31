@@ -61,18 +61,26 @@ const SignUp = () => {
                     "Accept": "application/json",
                     "Content-Type": "application/json"
                 }
-            }).then(res => res.json()).then(res => {
-                // If successful, wipe in code page
-                if (res.success === true) {
-                    setAccountCreationID(res.accountCreationID);
-                    showCodeDiv();
+            }).then(async (res) => {
+                // If successful response
+                if (res.status === 200) {
+                    res = await res.json();
+                    if (res.success === true) {
+                        setAccountCreationID(res.accountCreationID);
+                        showCodeDiv();
+                    }
+                    else {
+                        setEmailErrorMsg(res.reason);
+                    }
+                }
+                else if (res.status === 429) {
+                    setEmailErrorMsg("You sent too many requests too quickly. Please wait for a minute before attempting again.");
                 }
                 else {
-                    setEmailErrorMsg(res.reason);
+                    setEmailErrorMsg("An unknown error occured. Please try again.");
                 }
-                console.log(res);
             }).catch((err) => {
-                setEmailErrorMsg("Server error. This may have happened if you sent too many requests too quickly. Please try waiting for one minute before trying again.");
+                setEmailErrorMsg("Could not connect to server. Please try again later.");
             });
         }
         setEmailLoading(false);
@@ -170,7 +178,6 @@ const SignUp = () => {
     }
 
     function toggle() {
-        console.log(userPassClassName);
         if (userPassClassName !== "signup-div-show") {
             showUserPassDiv();
             setSignupDivClassName("");
@@ -189,7 +196,7 @@ const SignUp = () => {
                 {/* PROVIDE EMAIL DIV */}
                 <div className={"signup-div " + emailClassName}>
                     <form className="signup-form" onSubmit={submitEmail}>
-                        <p className="signup-title">Sign Up</p>
+                        <p className="signup-title">Get Started</p>
                         <div className="signup-form-area signup-space-above">
                             <p className="signup-error-msg signup-text-left">{emailErrorMsg}</p>
                             <label htmlFor="signup-email" className="signup-form-text signup-text-left">Enter your email:</label>
@@ -198,7 +205,7 @@ const SignUp = () => {
                         </div>
                     </form>
                     <div className="login-instead-div">
-                        <p className="signup-form-text login-instead-text">Already have an account? <Link to="/" className="text-button">Log in</Link> instead.</p>
+                        <p className="signup-form-text login-instead-text">Already have an account? <Link to="/" className="text-button" onClick={() => sessionStorage.setItem("expandLogin", "true")}>Log in</Link> instead.</p>
                     </div>
                 </div>
 
@@ -246,7 +253,7 @@ const SignUp = () => {
                 </div>
 
             </div>
-            {/* <GrayButton onClick={toggle} loading={emailLoading.toString()} > Toggle</GrayButton > */}
+            <GrayButton onClick={toggle} > Toggle</GrayButton >
         </>
     );
 }

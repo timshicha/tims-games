@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
-import "./GrayButton.css";
+// import "./GrayButton.css";
 
 const GrayButton = (props) => {
 
@@ -45,7 +45,7 @@ const GrayButton = (props) => {
         }, [props.loading]);
 
         return (
-            <button ref={grayButtonRef} {...props} className={"gray-button-component " + props.className}>
+            <button ref={grayButtonRef} {...props} className={"gray-button-component " + props.className + (loading ? " gray-button-not-clickable": "")}>
                 {loading && <div ref={loadingImgRef} className="gray-button-bg" />}
                 {props.children}
             </button>

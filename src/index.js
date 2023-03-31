@@ -1,4 +1,5 @@
 import React from 'react';
+import "./components/GrayButton/GrayButton.css";
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
@@ -13,8 +14,8 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="dot-game" element={<DotGame />} />
-        <Route path="signup" element={<SignUp />} />
+        <Route path="/dot-game" element={<DotGame />} />
+        <Route path="/create-account" element={<SignUp />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

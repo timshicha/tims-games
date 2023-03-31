@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import "./Home.css";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, Navigate } from "react-router-dom";
+import NavBar from "../../components/NavBar/Navbar";
 import { socket } from "../socket";
 
-function Home() {
+function Home(props) {
 
     const sendMessage = () => {
         socket.emit("message", "ms");
     }
+
 
     const login = () => {
         let username = document.getElementById("login-username").value;
@@ -33,16 +36,13 @@ function Home() {
 
     return (
         <>
-            Username:<input type="text" id="login-username"></input><br />
-            Password:<input type="password" id="login-password"></input><br />
-            <button onClick={login}>Login</button>
-
-
-            <p>Home</p>
-            <Link to="/signup">Login</Link><br />
-            <Link to="/dot-game">Dot Game</Link>
-
-            <button onClick={sendMessage}>Send message</button>
+            <NavBar />
+            <div className="homepage-div">
+                <p>Home</p>
+                <Link to="/create-account">Login</Link><br />
+                <Link to="/dot-game">Dot Game</Link>
+                <button onClick={sendMessage}>Send message</button>
+            </div>
         </>
     );
 }

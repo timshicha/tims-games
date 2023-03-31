@@ -1,0 +1,116 @@
+
+.navbar-container-div {
+    width: 100%;
+    position: fixed;
+    z-index: 1;
+    height: 50px;
+}
+
+.navbar-div {
+    height: 100%;
+    width: 100%;
+    background-color: #98a3fa;
+}
+
+.navbar-right-buttons-div {
+    padding: 5px;
+    float: right;
+}
+
+.navbar-button {
+    padding: 10px;
+    box-sizing: border-box;
+    height: 40px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.dark-bg {
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    background-color: black;
+    opacity: 0;
+    z-index: 2;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.dark-bg-show {
+    opacity: 0.8;
+    pointer-events: all;
+}
+
+.navbar-login-container {
+    position: fixed;
+    right: 0px;
+    top: 60px;
+    height: fit-content;
+    width: 500px;
+    max-width: 90%;
+    z-index: 3;
+    overflow: hidden;
+}
+
+.navbar-login-div {
+    height: fit-content;
+    width: 500px;
+    min-width: 200px;
+    max-width: 98%;
+    box-sizing: border-box;
+    background-color: #98a3fa;
+    border-radius: 10px;
+    border: 5px #787878 solid;
+    padding: 10px;
+    margin-left: 520px;
+    transition: margin-left 0.3s;
+}
+
+.navbar-login-div-show {
+    margin-left: 0px;
+}
+
+.login-form-text {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(70, 70, 70);
+    margin-bottom: 8px;
+    margin-top: 20px;
+}
+
+.login-input-field {
+    font-size: 22px;
+    font-weight: bold;
+    color: #464646;
+    letter-spacing: 0.5px;
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    border: 3px solid #787878;
+    padding: 10px 8px 10px 8px;
+    outline: none;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+
+.login-error-msg {
+    margin-top: 10px;
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(200, 0, 0);
+    margin-bottom: 20px;
+}
+
+.login-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+.login-button {
+    width: 150px;
+}

@@ -13,7 +13,6 @@
     letter-spacing: 0.5px;
 }
 
-
 .gray-button-bg {
     position: absolute;
     height: 30px;
@@ -26,4 +25,8 @@
 
 .gray-button-component:hover {
     background-color: #323232;
+}
+
+.gray-button-not-clickable {
+    pointer-events: none;
 }

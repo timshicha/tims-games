@@ -7,6 +7,7 @@ import Home from './pages/Home/Home';
 import DotGame from './pages/DotGame/DotGame';
 import reportWebVitals from './reportWebVitals';
 import SignUp from './pages/SignUp/SignUp';
+import { socket } from './socket';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

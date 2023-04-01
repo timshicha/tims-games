@@ -1,26 +1,25 @@
 
-.navbar-container-div {
+
+.navbar-div {
+    height: 44px;
     width: 100%;
     position: fixed;
     z-index: 1;
-    height: 50px;
-}
-
-.navbar-div {
-    height: 100%;
-    width: 100%;
     background-color: #98a3fa;
 }
 
 .navbar-right-buttons-div {
-    padding: 5px;
+    margin-top: 5px;
     float: right;
+    /* display: flex; */
 }
 
 .navbar-button {
     padding: 10px;
     box-sizing: border-box;
-    height: 40px;
+    height: auto;
+    font-size: 15px;
+    padding: 8px;
     margin-left: 5px;
     margin-right: 5px;
 }
@@ -46,24 +45,27 @@
     right: 0px;
     top: 60px;
     height: fit-content;
-    width: 500px;
-    max-width: 90%;
+    width: 320px;
+    min-width: 240px;
     z-index: 3;
     overflow: hidden;
+    pointer-events: none;
+    display: flex;
 }
 
 .navbar-login-div {
     height: fit-content;
-    width: 500px;
-    min-width: 200px;
-    max-width: 98%;
+    min-width: 100%;
     box-sizing: border-box;
     background-color: #98a3fa;
-    border-radius: 10px;
+    border-radius: 10px 0px 0px 10px;
     border: 5px #787878 solid;
+    border-right: none;
     padding: 10px;
-    margin-left: 520px;
-    transition: margin-left 0.3s;
+    padding-top: 0px;
+    margin-left: 100%;
+    transition: margin-left 0.25s;
+    pointer-events: all;
 }
 
 .navbar-login-div-show {
@@ -72,15 +74,15 @@
 
 .login-form-text {
     display: block;
-    font-size: 18px;
+    font-size: 13px;
     font-weight: bold;
     color: rgb(70, 70, 70);
-    margin-bottom: 8px;
-    margin-top: 20px;
+    margin-bottom: 5px;
+    margin-top: 10px;
 }
 
 .login-input-field {
-    font-size: 22px;
+    font-size: 15px;
     font-weight: bold;
     color: #464646;
     letter-spacing: 0.5px;
@@ -98,7 +100,7 @@
 .login-error-msg {
     margin-top: 10px;
     display: block;
-    font-size: 18px;
+    font-size: 13px;
     font-weight: bold;
     color: rgb(200, 0, 0);
     margin-bottom: 20px;
@@ -108,9 +110,63 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 25px;
+    margin-top: 15px;
 }
 
 .login-button {
-    width: 150px;
+    width: 120px;
+}
+
+.navbar-dropdown-button {
+    overflow: hidden;
+    padding-right: 38px;
+    margin-left: 100px;
+}
+
+.navbar-profile-image {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: calc(50% - 12.5px);
+    right: 4px;
+    border-radius: 4px;
+}
+
+.navbar-expanded-profile-container {
+    position: fixed;
+    right: 0px;
+    top: 60px;
+    height: fit-content;
+    max-height: 400px;
+    width: 250px;
+    max-width: 90%;
+    z-index: 3;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    pointer-events: none;
+}
+
+.navbar-expanded-profile-container.show {
+    overflow-y: auto;
+    pointer-events: all;
+}
+
+.navbar-expanded-profile-div {
+    width: 100%;
+    background-color: green;
+    margin-left: 100%;
+    transition: margin-left 0.25s;
+    pointer-events: all;
+    box-sizing: border-box;
+    background-color: #98a3fa;
+    border-radius: 10px 0px 0px 10px;
+    border: 5px #787878 solid;
+    border-right: none;
+    padding: 10px;
+    margin-left: 100%;
+    transition: margin-left 0.25s;
+}
+
+.navbar-expanded-profile-div-show {
+    margin-left: 0;
 }

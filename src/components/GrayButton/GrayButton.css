@@ -15,12 +15,12 @@
 
 .gray-button-bg {
     position: absolute;
-    height: 30px;
-    width: 30px;
+    height: 26px;
+    width: 26px;
     background: url("../../assets/loading_circle.svg") 0 0 no-repeat;
-    background-size: 30px;
-    top: calc(50% - 15px);
-    left: calc(50% - 15px);
+    background-size: 26px;
+    top: calc(50% - 13px);
+    left: calc(50% - 13px);
 }
 
 .gray-button-component:hover {

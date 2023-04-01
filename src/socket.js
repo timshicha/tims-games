@@ -6,12 +6,12 @@ const URL = process.env.REACT_APP_API_BASE_URL;
 let socket;
 let socketConnected = false;
 
-const socketConnect = (sessionID) => {
+const socketConnect = (tempID) => {
     // If the socket is already connected, ignore
     if (socketConnected) {
         return;
     }
-    socket = io.connect(URL, { query: `userID=${getCookie("sessionID")}` });
+    socket = io.connect(URL, { withCredentials: true });
 
     socket.on("connect", () => {
         console.log("Connected");
@@ -25,7 +25,16 @@ const socketDisconnect = () => {
     if (!socketConnected) {
         return;
     }
-    socket.socketDisconnect();
+    socket.disconnect();
+    socketConnected = false;
 }
 
-module.exports = { socket, socketConnect, socketDisconnect };
+const socketEmit = (message) => {
+    if (!socketConnected) {
+        console.log("Cannot send message when socket is disconnected.");
+        return;
+    }
+    socket.emit("message", message);
+}
+
+module.exports = { socketConnect, socketDisconnect, socketEmit };

@@ -2,21 +2,23 @@ import "./Home.css";
 import React, { useEffect, useState, useRef } from "react";
 import { Link, Navigate } from "react-router-dom";
 import NavBar from "../../components/NavBar/Navbar";
-import { socketConnect, socketDisconnect, socketEmit } from "../../socket";
+import MySocket from "../../socket";
 import { getCookie } from "../../utilities";
 
-function Home(props) {
+function Home() {
 
     const sendMessage = () => {
-        socketEmit(document.getElementById("message").value);
+        if (MySocket.isConnected()) {
+            MySocket.getSocket().emit("message", document.getElementById("message").value);
+        }
     }
 
     const connectToSocket = async () => {
-        socketConnect();
+        MySocket.connect();
     }
 
     const disconnectFromSocket = () => {
-        socketDisconnect();
+        MySocket.disconnect();
     }
 
     return (

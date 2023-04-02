@@ -1,6 +1,7 @@
 import './DotGame.css';
-import { useState } from 'react';
-import {findPaths, createPathMatrix, findPathAndMatrix} from './path-alg';
+import { useEffect, useState } from 'react';
+import { findPathAndMatrix } from './path-alg';
+import MySocket from '../../socket';
 
 function DotGame() {
 
@@ -10,6 +11,26 @@ function DotGame() {
   let size = 20;
   // How big the circles should be
   let circleSize = scale;
+
+  useEffect(() => {
+    
+    if (MySocket.getSocket() && MySocket.getSocket().connected) {
+      MySocket.getSocket().on("dot-game-start", (data) => {
+        console.log("Data:", data);
+      });
+
+      MySocket.getSocket().on("dot-game-move", (data) => {
+        console.log("Data:", data.board);
+      });
+    }
+
+    return () => {
+      if (MySocket.getSocket() && MySocket.getSocket().connected) {
+        MySocket.getSocket().off("dot-game-start");
+        MySocket.getSocket().off("dot-game-move");
+      }
+    }
+  }, []);
 
   const [playerTerritory, setPlayerTerritory] = useState(0);
 
@@ -122,13 +143,16 @@ function DotGame() {
       obj.style.width = scale + "px";
       obj.style.height = scale + "px";
       gameBoard[x][y] = 1;
+      MySocket.getSocket().emit("dot-game-move", {x: x, y: y});
       // let paths = findPaths(gameBoard, [x, y]);
       // let pathMatrix = createPathMatrix(gameBoard, [x, y]);
       // console.log("Path matrix:", pathMatrix);
       let res = findPathAndMatrix(gameBoard, [x, y]);
+      // fillMatrix(gameBoard, 1);
+      console.log(gameBoard);
       let path = res[0];
       let filledMatrix = res[1];
-      console.log("Path that was found:", path);
+      // console.log("Path that was found:", path);
       if(path && filledMatrix) {
         drawCanvasPath(path);
         for (let i = 0; i < size - 1; i++) {
@@ -181,12 +205,8 @@ function DotGame() {
     context.clearRect(0, 0, size * scale, size * scale);
   }
 
-  function testServer() {
-    fetch(process.env.REACT_APP_API_BASE_URL + "/api/test").then(res => res.text()).then((res) => {
-      alert(res);
-    }).catch((err) => {
-      alert("Failed to reach server");
-    });
+  function joinGame() {
+    MySocket.getSocket().emit("dot-game-start", {playWith: null});
   }
 
   return (
@@ -197,7 +217,7 @@ function DotGame() {
         <button onClick={() => setupCanvas()}>Set Up Canvas</button>
         <button onClick={() => setupUI()}>Set Up UI</button>
         <button onClick={() => clear()}>Clear</button>
-        <button onClick={() => testServer()}>Test server</button>
+        <button onClick={() => joinGame()}>Join game</button>
         <p>You can win in the following ways:</p>
         <ul>
           <li>Control 25% of the territory first (your current territory: {Math.round(playerTerritory * 100 / maxTerritory * 100) / 100}%)</li>

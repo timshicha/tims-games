@@ -73,49 +73,51 @@ const clearMatrix = (matrix) => {
     }
 }
 
-const findPaths = (matrix, startPos) => {
-    let visited = createEmptyMatrix(matrix.length, matrix[0].length);
-    let queues = Array(0);
+// const findPaths = (matrix, startPos) => {
+//     console.log("here");
+//     let visited = createEmptyMatrix(matrix.length, matrix[0].length);
+//     let queues = Array(0);
 
-    function searchNext(prevPos, pos) {
-        // If reached the starting position (found path)
-        if (cmp(pos, startPos)) {
-            return Array(pos);
-        }
-        // If we have been visited already, also return
-        if (visited[pos[0]][pos[1]] === 1) {
-            return null;
-        }
-        // Otherwise, add ourselves to the queue, and mark as visited
-        visited[pos[0]][pos[1]] = 1;
-        // Search for a path from each neighbor
-        let neighbors = findNeighborsInOrder(matrix, pos, prevPos);
-        for (let i = 0; i < neighbors.length; i++) {
-            let neighbor = neighbors[i];
-            let queue = searchNext(pos, neighbor);
-            if (queue != null) {
-                queue.push(pos);
-                return queue;
-            }
-        }
-        return null;
-    }
+//     function searchNext(prevPos, pos) {
+//         // If reached the starting position (found path)
+//         if (cmp(pos, startPos)) {
+//             return Array(pos);
+//         }
+//         // If we have been visited already, also return
+//         if (visited[pos[0]][pos[1]] === 1) {
+//             return null;
+//         }
+//         // Otherwise, add ourselves to the queue, and mark as visited
+//         visited[pos[0]][pos[1]] = 1;
+//         // Search for a path from each neighbor
+//         let neighbors = findNeighborsInOrder(matrix, pos, prevPos);
+//         for (let i = 0; i < neighbors.length; i++) {
+//             let neighbor = neighbors[i];
+//             let queue = searchNext(pos, neighbor);
+//             if (queue != null) {
+//                 queue.push(pos);
+//                 return queue;
+//             }
+//         }
+//         return null;
+//     }
 
-    matrix[startPos[0]][startPos[1]] = 1;
-    // Search new paths formed
-    let neighbors = findNeighborsInOrder(matrix, startPos, null);
-    // find path formed by each neighbor
-    for (let i = 0; i < neighbors.length; i++) {
-        clearMatrix(visited);
-        let queue = searchNext(startPos, neighbors[i]);
-        if (queue) {
-            queue.push(startPos)
-            queues.push(queue);
-        }
-        queue = null;
-    }
-    return queues;
-}
+//     matrix[startPos[0]][startPos[1]] = 1;
+//     // Search new paths formed
+//     let neighbors = findNeighborsInOrder(matrix, startPos, null);
+//     // find path formed by each neighbor
+//     for (let i = 0; i < neighbors.length; i++) {
+//         clearMatrix(visited);
+//         let queue = searchNext(startPos, neighbors[i]);
+//         if (queue) {
+//             queue.push(startPos)
+//             queues.push(queue);
+//         }
+//         queue = null;
+//     }
+//     console.log("Queues:", queues);
+//     return queues;
+// }
 
 const fillMatrix = (matrix) => {
     const swap0and1 = (num) => {
@@ -175,6 +177,8 @@ const fillMatrix = (matrix) => {
             retMatrix[i][j] = swap0and1(v[i + 1][j + 1]);
         }
     }
+    // Everything that's a 1 is to be filled in
+    console.log(retMatrix);
     return retMatrix;
 }
 
@@ -221,6 +225,7 @@ const createPathMatrix = (matrix, startPos) => {
     if (!pathExists) {
         return null;
     }
+    // console.log(pathMatrix);
     return fillMatrix(pathMatrix);
 }
 
@@ -243,14 +248,14 @@ const findLeftMostPath = (matrix) => {
 
     let path = [[topLeft[0], topLeft[1]]];
     let prev = [topLeft[0] - 1, topLeft[1] + 1];
-    console.log("Current:", topLeft, "Previous:", prev);
+    // console.log("Current:", topLeft, "Previous:", prev);
     let current = findNeighborsInOrder(matrix, topLeft, prev)[0];
     prev = topLeft;
 
     // Until we reach out starting point
     while (current && !cmp(current, topLeft)) {
         path.push(current);
-        console.log("Current:", current, "Previous:", prev);
+        // console.log("Current:", current, "Previous:", prev);
         let newCurrent = findNeighborsInOrder(matrix, current, prev)[0];
         prev = current;
         current = newCurrent;
@@ -269,9 +274,10 @@ const findPathAndMatrix = (matrix, startPos) => {
         return [null, null];
     }
     let leftMostPath = findLeftMostPath(pathMatrix);
+    // console.log("Path matrix:", pathMatrix);
     return [leftMostPath, pathMatrix];
 }
 
 
-module.exports = { findPaths, createPathMatrix, findPathAndMatrix };
+module.exports = { findPathAndMatrix };
 

@@ -20,7 +20,42 @@ function DotGame() {
       });
 
       MySocket.getSocket().on("dot-game-move", (data) => {
-        console.log("Data:", data.board);
+        if (!data.success) {
+          return;
+        }
+        console.log("Data:", data);
+        // let paths = findPaths(gameBoard, [x, y]);
+        // let pathMatrix = createPathMatrix(gameBoard, [x, y]);
+        // console.log("Path matrix:", pathMatrix);
+        // let res = findPathAndMatrix(gameBoard, [x, y]);
+        // fillMatrix(gameBoard, 1);
+        // console.log(gameBoard);
+        // let path = res[0];
+        // let filledMatrix = res[1];
+        // console.log("Path that was found:", path);
+        // if (path && filledMatrix) {
+        // drawCanvasPath(path);
+        gameBoard = data.board;
+        for (let i = 0; i < size - 1; i++) {
+          for (let j = 0; j < size - 1; j++) {
+            if (gameBoard[i][j] === 1) {
+              uiBoard[i][j].classList = 'circle-btn circle-btn-blue';
+            }
+            else if (gameBoard[i][j] === 1) {
+              uiBoard[i][j].classList = 'circle-btn circle-btn-green';
+            }
+          }
+        }
+        let context = document.getElementById('g-canvas').getContext('2d');
+        let totalArea = 0;
+        for (let i = 0; i < size - 2; i++) {
+          for (let j = 0; j < size - 2; j++) {
+            totalArea += fillSquare(context, i, j, -1, "#00ff00");
+            totalArea += fillSquare(context, i, j, 1, "#0000ff");
+          }
+        }
+        setPlayerTerritory(totalArea);
+        // }
       });
     }
 
@@ -34,10 +69,10 @@ function DotGame() {
 
   const [playerTerritory, setPlayerTerritory] = useState(0);
 
-  let maxTerritory = (size - 2) * (size - 2);
+  var maxTerritory = (size - 2) * (size - 2);
 
   // Create the board
-  let gameBoard = Array(size - 1);
+  var gameBoard = Array(size - 1);
   for (let i = 0; i < size - 1; i++) {
     gameBoard[i] = Array(size - 1);
     for (let j = 0; j < size - 1; j++) {
@@ -45,7 +80,7 @@ function DotGame() {
     }
   }
 
-  let uiBoard = Array(size - 1);
+  var uiBoard = Array(size - 1);
   for (let i = 0; i < size - 1; i++) {
     uiBoard[i] = Array(size - 1);
   }
@@ -69,34 +104,34 @@ function DotGame() {
     context.stroke();
 
     // If a path was given, draw it
-    if (path) {
-      drawCanvasPath(path);
-    }
+    // if (path) {
+    //   drawCanvasPath(path);
+    // }
   }
 
-  function drawCanvasPath(path, color) {
-    let canvas = document.getElementById('g-canvas');
-    let context = canvas.getContext('2d');
-    context.beginPath();
-    // Draw the path
-    context.moveTo((path[0][1] + 1) * scale, (path[0][0] + 1) * scale);
-    for (let i = 1; i < path.length; i++) {
-      context.lineTo((path[i][1] + 1) * scale, (path[i][0] + 1) * scale);
-    }
-    context.strokeStyle = "#0000ff";
-    context.stroke();
-  }
+  // function drawCanvasPath(path, color) {
+  //   let canvas = document.getElementById('g-canvas');
+  //   let context = canvas.getContext('2d');
+  //   context.beginPath();
+  //   // Draw the path
+  //   context.moveTo((path[0][1] + 1) * scale, (path[0][0] + 1) * scale);
+  //   for (let i = 1; i < path.length; i++) {
+  //     context.lineTo((path[i][1] + 1) * scale, (path[i][0] + 1) * scale);
+  //   }
+  //   context.strokeStyle = "#0000ff";
+  //   context.stroke();
+  // }
 
   // Fill square and return area (0, 0.5, or 1)
-  function fillSquare(context, row, col) {
+  function fillSquare(context, row, col, player, color) {
     function drawTriangle(context, coords1, coords2, coords3) {
       context.beginPath();
       context.moveTo((coords1[1] + 1) * scale, (coords1[0] + 1) * scale);
       context.lineTo((coords2[1] + 1) * scale, (coords2[0] + 1) * scale);
       context.lineTo((coords3[1] + 1) * scale, (coords3[0] + 1) * scale);
       context.closePath();
-      context.strokeStyle = "#0000ff";
-      context.fillStyle = "#0000ff";
+      context.strokeStyle = color;
+      context.fillStyle = color;
       context.stroke();
       context.fill();
     }
@@ -106,30 +141,30 @@ function DotGame() {
     let bottomRight = gameBoard[row + 1][col + 1];
     let bottomLeft = gameBoard[row + 1][col];
 
-    let total = topLeft + topRight + bottomRight + bottomLeft;
+    let total = player * (topLeft + topRight + bottomRight + bottomLeft);
     // If all corners are filled in
     if (total === 4) {
       context.beginPath();
       // context.moveTo((row + 1) * scale, (col + 1) * scale);
       context.rect((col + 1) * scale, (row + 1) * scale, scale, scale);
-      context.strokeStyle = "#0000ff";
-      context.fillStyle = "#0000ff";
+      context.strokeStyle = color;
+      context.fillStyle = color;
       context.stroke();
       context.fill();
       return 1;
     }
     // If all but one corner are filled in
     else if (total === 3) {
-      if (topLeft === 0) {
+      if (topLeft !== player) {
         drawTriangle(context, [row, col + 1], [row + 1, col + 1], [row + 1, col]);
       }
-      else if (topRight === 0) {
+      else if (topRight !== player) {
         drawTriangle(context, [row, col], [row + 1, col + 1], [row + 1, col]);
       }
-      else if (bottomRight === 0) {
+      else if (bottomRight !== player) {
         drawTriangle(context, [row, col], [row, col + 1], [row + 1, col]);
       }
-      else if (bottomLeft === 0) {
+      else if (bottomLeft !== player) {
         drawTriangle(context, [row, col], [row, col + 1], [row + 1, col + 1]);
       }
       return 0.5;
@@ -143,61 +178,61 @@ function DotGame() {
       obj.style.width = scale + "px";
       obj.style.height = scale + "px";
       gameBoard[x][y] = 1;
-      MySocket.getSocket().emit("dot-game-move", {x: x, y: y});
-      // let paths = findPaths(gameBoard, [x, y]);
-      // let pathMatrix = createPathMatrix(gameBoard, [x, y]);
-      // console.log("Path matrix:", pathMatrix);
-      let res = findPathAndMatrix(gameBoard, [x, y]);
-      // fillMatrix(gameBoard, 1);
-      console.log(gameBoard);
-      let path = res[0];
-      let filledMatrix = res[1];
-      // console.log("Path that was found:", path);
-      if(path && filledMatrix) {
-        drawCanvasPath(path);
-        for (let i = 0; i < size - 1; i++) {
-          for (let j = 0; j < size - 1; j++) {
-            if (filledMatrix[i][j] === 1) {
-              gameBoard[i][j] = 1;
-              uiBoard[i][j].classList = 'circle-btn circle-btn-blue';
-            }
-          }
-        }
-        let context = document.getElementById('g-canvas').getContext('2d');
-        let totalArea = 0;
-        for (let i = 0; i < size - 2; i++) {
-          for (let j = 0; j < size - 2; j++) {
-            totalArea += fillSquare(context, i, j);
-          }
-        }
-        setPlayerTerritory(totalArea);
-      }
+      MySocket.getSocket().emit("dot-game-move", { x: x, y: y });
     }
+    // let paths = findPaths(gameBoard, [x, y]);
+    // let pathMatrix = createPathMatrix(gameBoard, [x, y]);
+    // console.log("Path matrix:", pathMatrix);
+    // let res = findPathAndMatrix(gameBoard, [x, y]);
+    // // fillMatrix(gameBoard, 1);
+    // console.log(gameBoard);
+    // let path = res[0];
+    // let filledMatrix = res[1];
+    // // console.log("Path that was found:", path);
+    // if (path && filledMatrix) {
+    //   drawCanvasPath(path);
+    //   for (let i = 0; i < size - 1; i++) {
+    //     for (let j = 0; j < size - 1; j++) {
+    //       if (filledMatrix[i][j] === 1) {
+    //         gameBoard[i][j] = 1;
+    //         uiBoard[i][j].classList = 'circle-btn circle-btn-blue';
+    //       }
+    //     }
+    //   }
+    //   let context = document.getElementById('g-canvas').getContext('2d');
+    //   let totalArea = 0;
+    //   for (let i = 0; i < size - 2; i++) {
+    //     for (let j = 0; j < size - 2; j++) {
+    //       totalArea += fillSquare(context, i, j);
+    //     }
+    //   }
+    //   setPlayerTerritory(totalArea);
+    // }
 
-    function createClickableCircle(x, y, x_coords = 0, y_coords = 0) {
-      let obj = document.createElement('input');
-      obj.type = 'button';
-      obj.classList = 'circle-btn circle-btn-gray hover';
-      obj.style.width = circleSize + "px";
-      obj.style.height = circleSize + "px";
-      obj.style.marginTop = x_coords - circleSize / 2 + "px";
-      obj.style.marginLeft = y_coords - circleSize / 2 + "px";
-      obj.onclick = () => clicked(obj, x, y);
-      return obj;
-    }
+  function createClickableCircle(x, y, x_coords = 0, y_coords = 0) {
+    let obj = document.createElement('input');
+    obj.type = 'button';
+    obj.classList = 'circle-btn circle-btn-gray hover';
+    obj.style.width = circleSize + "px";
+    obj.style.height = circleSize + "px";
+    obj.style.marginTop = x_coords - circleSize / 2 + "px";
+    obj.style.marginLeft = y_coords - circleSize / 2 + "px";
+    obj.onclick = () => clicked(obj, x, y);
+    return obj;
+  }
 
-    let ui = document.getElementById('g-div');
-    ui.style.width = size * scale + "px";
-    ui.style.height = size * scale + "px";
+  let ui = document.getElementById('g-div');
+  ui.style.width = size * scale + "px";
+  ui.style.height = size * scale + "px";
 
-    for (let i = 1; i < size; i++) {
-      for (let j = 1; j < size; j++) {
-        let circleUiBtn = createClickableCircle(i - 1, j - 1, i * scale, j * scale);
-        uiBoard[i - 1][j - 1] = circleUiBtn;
-        ui.append(circleUiBtn);
-      }
+  for (let i = 1; i < size; i++) {
+    for (let j = 1; j < size; j++) {
+      let circleUiBtn = createClickableCircle(i - 1, j - 1, i * scale, j * scale);
+      uiBoard[i - 1][j - 1] = circleUiBtn;
+      ui.append(circleUiBtn);
     }
   }
+}
 
   function clear() {
     let canvas = document.getElementById('g-canvas');

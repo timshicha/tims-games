@@ -2,13 +2,13 @@
 .gray-button-component {
     position: relative;
     overflow: hidden;
-    font-size: 18px;
+    font-size: 15px;
     font-weight: bold;
     background-color: #464646;
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 15px;
+    padding: 10px;
     cursor: pointer;
     letter-spacing: 0.5px;
 }

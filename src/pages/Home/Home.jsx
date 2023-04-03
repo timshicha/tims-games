@@ -26,8 +26,8 @@ function Home() {
             <NavBar />
             <div className="homepage-div">
                 <Link to="/dot-game">Dot Game</Link><br/><br/>
-                <button onClick={connectToSocket}>Connect Web Socket</button><br/>
-                <button onClick={disconnectFromSocket}>Disconnect Web Socket</button><br/><br/>
+                {/* <button onClick={connectToSocket}>Connect Web Socket</button><br/>
+                <button onClick={disconnectFromSocket}>Disconnect Web Socket</button><br/><br/> */}
                 <input type="text" id="message" /><br />
                 <button onClick={sendMessage}>Send message</button><br/><br/>
             </div>

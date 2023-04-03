@@ -17,15 +17,18 @@ const SignUp = () => {
     const [emailLoading, setEmailLoading] = useState(false);
     const [codeLoading, setCodeLoading] = useState(false);
     const [userPassLoading, setUserPassLoading] = useState(false);
-    const codeRef = useRef(null);
+    const emailInputRef = useRef(null);
+    const codeInputRef = useRef(null);
+    const usernameInputRef = useRef(null);
 
     const showEmailDiv = () => {
         setEmailClassName("signup-div-show");
         setCodeClassName("signup-div-hidden-right");
         setUserPassClassName("signup-div-hidden-right");
-        codeRef.current.value = "";
+        codeInputRef.current.value = "";
         setCodeErrorMsg(null);
         setUserPassErrorMsg(null);
+        emailInputRef.current.focus({ preventScroll: true });
     }
     
     const showCodeDiv = () => {
@@ -34,15 +37,17 @@ const SignUp = () => {
         setUserPassClassName("signup-div-hidden-right");
         setEmailErrorMsg(null);
         setUserPassErrorMsg(null);
+        codeInputRef.current.focus({ preventScroll: true });
     }
 
     const showUserPassDiv = () => {
         setEmailClassName("signup-div-hidden-left");
         setCodeClassName("signup-div-hidden-left");
         setUserPassClassName("signup-div-show");
-        codeRef.current.value = "";
+        codeInputRef.current.value = "";
         setEmailErrorMsg(null);
         setCodeErrorMsg(null);
+        usernameInputRef.current.focus({ preventScroll: true });
     }
 
     const submitEmail = async (event) => {
@@ -201,7 +206,7 @@ const SignUp = () => {
                         <div className="signup-form-area signup-space-above">
                             <p className="signup-error-msg signup-text-left">{emailErrorMsg}</p>
                             <label htmlFor="signup-email" className="signup-form-text signup-text-left">Enter your email:</label>
-                            <input type="email" className="signup-input-field" id="signup-email" name="email" placeholder="example@email.com" />
+                            <input autoFocus ref={emailInputRef} type="email" className="signup-input-field" id="signup-email" name="email" placeholder="example@email.com" />
                             <GrayButton type="submit" className="signup-submit-button" loading={emailLoading.toString()}>Send Code</GrayButton>
                         </div>
                     </form>
@@ -218,7 +223,7 @@ const SignUp = () => {
                             <p className="signup-error-msg signup-text-left">{codeErrorMsg}</p>
                             <p className="signup-form-text signup-text-left">A 6-digit verification code was sent to your email.</p>
                             <label htmlFor="signup-code" className="signup-form-text signup-text-left">Enter the verification code:</label>
-                            <input ref={codeRef} type="text" className="signup-input-field code-input-field" id="signup-code" name="code" placeholder="000000" maxLength={6} />
+                            <input ref={codeInputRef} type="text" className="signup-input-field code-input-field" id="signup-code" name="code" placeholder="000000" maxLength={6} />
                             <GrayButton type="submit" className="signup-submit-button" loading={codeLoading.toString()}>Verify Code</GrayButton>
                         </div>
                     </form>
@@ -234,7 +239,7 @@ const SignUp = () => {
                         <div className="signup-form-area">
                             <p className="signup-error-msg signup-text-left">{userPassErrorMsg}</p>
                             <label htmlFor="signup-username" className="signup-form-text signup-text-left">Create username:</label>
-                            <input type="text" className="signup-input-field" id="signup-username" name="username" placeholder="new_username" />
+                            <input ref={usernameInputRef} type="text" className="signup-input-field" id="signup-username" name="username" placeholder="new_username" />
                             <br />
                             <label htmlFor="signup-password" className="signup-form-text signup-text-left">Create a password:</label>
                             <input type="password" className="signup-input-field" id="signup-password" name="password" placeholder="Password" />

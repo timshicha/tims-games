@@ -41,7 +41,7 @@ function DotGame() {
             if (gameBoard[i][j] === 1) {
               uiBoard[i][j].classList = 'circle-btn circle-btn-blue';
             }
-            else if (gameBoard[i][j] === 1) {
+            else if (gameBoard[i][j] === -1) {
               uiBoard[i][j].classList = 'circle-btn circle-btn-green';
             }
           }
@@ -141,7 +141,11 @@ function DotGame() {
     let bottomRight = gameBoard[row + 1][col + 1];
     let bottomLeft = gameBoard[row + 1][col];
 
-    let total = player * (topLeft + topRight + bottomRight + bottomLeft);
+    let total = 0;
+    if (topLeft === player) { total += 1 };
+    if (topRight === player) { total += 1 };
+    if (bottomRight === player) { total += 1 };
+    if (bottomLeft === player) { total += 1 };
     // If all corners are filled in
     if (total === 4) {
       context.beginPath();
@@ -174,10 +178,10 @@ function DotGame() {
 
   function setupUI() {
     function clicked(obj, x, y) {
-      obj.classList = 'circle-btn circle-btn-blue';
-      obj.style.width = scale + "px";
-      obj.style.height = scale + "px";
-      gameBoard[x][y] = 1;
+      // obj.classList = 'circle-btn circle-btn-blue';
+      // obj.style.width = scale + "px";
+      // obj.style.height = scale + "px";
+      // gameBoard[x][y] = 1;
       MySocket.getSocket().emit("dot-game-move", { x: x, y: y });
     }
     // let paths = findPaths(gameBoard, [x, y]);

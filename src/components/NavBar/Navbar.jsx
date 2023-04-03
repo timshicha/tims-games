@@ -3,6 +3,7 @@ import GrayButton from "../GrayButton/GrayButton";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import sampleProfilePic from "../../assets/sample-profile-pic.svg";
+import MySocket from "../../socket";
 import { getCookie } from "../../utilities.js";
 
 const NavBar = () => {
@@ -16,17 +17,19 @@ const NavBar = () => {
     const loginExpandedRef = useRef(null);
     const loginFormRef = useRef(null);
     const [logoutLoading, setLogoutLoading] = useState(false);
+    const loginUsernameRef = useRef(null);
 
     // Check if the user is logged in
     
     useEffect(() => {
         if (sessionStorage.getItem("expandLogin") === "true") {
-            setLoginExpanded(true);
+            expandLoginDiv();
             sessionStorage.removeItem("expandLogin");
         }
     }, []);
 
     const expandLoginDiv = () => {
+        loginUsernameRef.current.focus({ preventScroll: true });
         setLoginExpanded(true);
         setLoginErrorMsg("");
     }
@@ -38,8 +41,11 @@ const NavBar = () => {
     }
 
     const login = async (event) => {
-        setLoginLoading(true);
+        let submitForm = false;
         event.preventDefault();
+
+
+        setLoginLoading(true);
         let username = event.target.username.value;
         let password = event.target.password.value;
 
@@ -64,12 +70,14 @@ const NavBar = () => {
                 if (res.status === 200) {
                     res = await res.json();
                     // If successful
-                    if (res.success) {
+                    if (res.success === true) {
                         console.log("Login successful.");
                         loginFormRef.current.reset();
                         collapseLoginDiv();
                         setLoggedIn(true);
                         setUsername(getCookie("username"));
+                        MySocket.connect();
+                        submitForm = true;
                     }
                     else {
                         setLoginErrorMsg(res.reason);
@@ -81,6 +89,9 @@ const NavBar = () => {
             }).catch(() => {
                 setLoginErrorMsg("A server error occured.");
             });
+        }
+        if (submitForm) {
+            event.target.submit(); 
         }
         setLoginLoading(false);
     }
@@ -105,6 +116,7 @@ const NavBar = () => {
                     setProfileExpanded(false);
                     setLoggedIn(false);
                     setUsername("");
+                    MySocket.disconnect();
                 }
                 else {
                     console.log("Could not log out.");
@@ -149,21 +161,20 @@ const NavBar = () => {
                     </div>
                 </div>
             {/* Expanded login pop-up */}
-            {/* {loginExpanded && */}
-                <div className="navbar-login-container">
-                    <div ref={loginExpandedRef} className={"navbar-login-div " + (loginExpanded ? "navbar-login-div-show" : "")}>
-                        <form className="login-form" ref={loginFormRef} onSubmit={login}>
-                            <p className="login-error-msg">{loginErrorMsg}</p>
-                            <label htmlFor="login-username" className="login-form-text">Username or Email:</label>
-                            <input type="text" className="login-input-field" id="login-username" name="username" placeholder="Username or Email"></input>
-                            <label htmlFor="login-password" className="login-form-text" >Password:</label>
-                            <input type="password" className="login-input-field" id="login-password" name="password" placeholder="Password"></input>
-                            <div className="login-button-container">
-                                <GrayButton type="submit" className="navbar-button login-button" loading={loginLoading.toString()}>Log In</GrayButton>
-                            </div>
-                        </form>
-                    </div>
+            <div className="navbar-login-container">
+                <div ref={loginExpandedRef} className={"navbar-login-div " + (loginExpanded ? "navbar-login-div-show" : "")}>
+                    <form className="login-form" ref={loginFormRef} onSubmit={login}>
+                        <p className="login-error-msg">{loginErrorMsg}</p>
+                        <label htmlFor="login-username" className="login-form-text">Username or Email:</label>
+                        <input ref={loginUsernameRef} type="text" className="login-input-field" id="login-username" name="username" placeholder="Username or Email"></input>
+                        <label htmlFor="login-password" className="login-form-text" >Password:</label>
+                        <input type="password" className="login-input-field" id="login-password" name="password" placeholder="Password"></input>
+                        <div className="login-button-container">
+                            <GrayButton type="submit" className="navbar-button login-button" loading={loginLoading.toString()}>Log In</GrayButton>
+                        </div>
+                    </form>
                 </div>
+            </div>
             {/* } */}
             {/* Expanded profile pop-up */}
             <div className={"navbar-expanded-profile-container " + (profileExpanded ? "show" : "")}>

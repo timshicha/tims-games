@@ -21,6 +21,10 @@ const connect = () => {
         console.log("Connected");
     });
 
+    socket.on("pre-disconnect", () => {
+        socketConnected = false;
+    });
+
     socketConnected = true;
 }
 
@@ -35,6 +39,11 @@ const disconnect = () => {
 
 const isConnected = () => {
     return socketConnected;
+}
+
+// Try automatically connecting if not connected
+if (!socketConnected) {
+    connect();
 }
 
 export default {

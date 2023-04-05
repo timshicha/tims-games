@@ -11,6 +11,9 @@ function Home() {
         if (MySocket.isConnected()) {
             MySocket.getSocket().emit("message", document.getElementById("message").value);
         }
+        else {
+            console.log("Not connected");
+        }
     }
 
     const connectToSocket = async () => {

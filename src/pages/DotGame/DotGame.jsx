@@ -37,6 +37,7 @@ function DotGame() {
     useEffect(() => {
         
         if (MySocket.isConnected()) {
+            MySocket.getSocket().off("dot-game-start");
             MySocket.getSocket().on("dot-game-start", (data) => {
                 console.log("Data:", data);
                 if (!data.success) {
@@ -45,7 +46,8 @@ function DotGame() {
                 setSearchGameText("Game against " + data.opponent + ".");
             });
             
-            MySocket.getSocket().on("dot-game-move", (data) => {
+            MySocket.getSocket().off("dot-game-update");
+            MySocket.getSocket().on("dot-game-update", (data) => {
                 if (!data.success) {
                     return;
                 }
@@ -54,6 +56,17 @@ function DotGame() {
                 upDateCanvas();
             });
 
+            MySocket.getSocket().off("dot-game-move");
+            MySocket.getSocket().on("dot-game-move", () => {
+                console.log("Your move");
+            });
+
+            MySocket.getSocket().off("dot-game-over");
+            MySocket.getSocket().on("dot-game-over", (data) => {
+                alert(data.reason);
+            });
+
+            MySocket.getSocket().off("dot-game-stop");
             MySocket.getSocket().on("dot-game-stop", (data) => {
                 console.log(data);
                 if (data.success) {
@@ -68,9 +81,11 @@ function DotGame() {
         
         return () => {
             if (MySocket.getSocket() && MySocket.getSocket().connected) {
-                MySocket.getSocket().off("dot-game-start");
                 MySocket.getSocket().off("dot-game-move");
+                MySocket.getSocket().off("dot-game-start");
                 MySocket.getSocket().off("dot-game-stop");
+                MySocket.getSocket().off("dot-game-over");
+                MySocket.getSocket().off("dot-game-update");
             }
         }
     }, []);
@@ -201,6 +216,10 @@ function DotGame() {
     }
 
     function searchGame() {
+        if (!MySocket.isConnected()) {
+            console.log("You are not connected.");
+            return;
+        }
         // Start searching
         if (!searching) {
             console.log("Starting search");
@@ -218,10 +237,10 @@ function DotGame() {
     return (
         <>
             <div className="dot-game-page">
-                <button onClick={() => { resetCanvas(); resetUI(); }}>Setup</button>
+                <GrayButton onClick={() => { resetCanvas(); resetUI(); }}>Setup</GrayButton>
                     <p>You can win in the following ways:</p>
                 <ul>
-                    <li>Control 25% of the territory first (your current territory: {Math.round(playerTerritory * 100 / maxTerritory * 100) / 100}%)</li>
+                    <li>Control 20% of the territory first (your current territory: {Math.round(playerTerritory * 100 / maxTerritory * 100) / 100}%)</li>
                     <li>Control 20 more units than your opponent (you control: {playerTerritory})</li>
                     <li>Control more territory once all dots have been filled</li>
                 </ul>

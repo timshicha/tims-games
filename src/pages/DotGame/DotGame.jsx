@@ -182,7 +182,7 @@ function DotGame() {
             obj.style.height = circleSize + "px";
             obj.style.marginTop = x_coords - circleSize / 2 + "px";
             obj.style.marginLeft = y_coords - circleSize / 2 + "px";
-            obj.onclick = () => clicked(obj, x, y);
+            obj.onclick = () => clicked(x, y);
             return obj;
         }
 
@@ -218,23 +218,23 @@ function DotGame() {
     return (
         <>
             <div className="dot-game-page">
-                {/* <button onClick={() => { resetCanvas(); resetUI(); }}>Setup</button>
-                    <button onClick={() => joinGame()}>Join game</button>
+                <button onClick={() => { resetCanvas(); resetUI(); }}>Setup</button>
                     <p>You can win in the following ways:</p>
                 <ul>
                     <li>Control 25% of the territory first (your current territory: {Math.round(playerTerritory * 100 / maxTerritory * 100) / 100}%)</li>
                     <li>Control 20 more units than your opponent (you control: {playerTerritory})</li>
                     <li>Control more territory once all dots have been filled</li>
                 </ul>
-                <div className="g-area">
-                    <canvas width={scale * size} height={scale * size} className='g-canvas' ref={canvasRef} />
-                    <div className="g-div" ref={uiDivRef}></div>
-                </div> */}
                 <div className="dot-game-title-div">
                     <h1>Dot Game</h1>
                     <p className="search-game-text">{searchGameText}</p>
                     <GrayButton className="search-game-button" onClick={searchGame}>{searching ? "Cancel search" : "Search for opponent"}</GrayButton>
                 </div>
+                <div className="g-area">
+                    <canvas width={scale * size} height={scale * size} className='g-canvas' ref={canvasRef} />
+                    <div className="g-div" ref={uiDivRef}></div>
+                </div>
+                
             </div>
             
         </>

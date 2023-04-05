@@ -17,23 +17,18 @@ function DotGame() {
     const [searchGameText, setSearchGameText] = useState("");
     const [searching, setSearching] = useState(false);
     const [playerTerritory, setPlayerTerritory] = useState(0);
+    const [uiBoard, setUiBoard] = useState(Array(size - 1).fill().map(() => Array(size - 1).fill()));
     var maxTerritory = (size - 2) * (size - 2);
-
-        // Create the board
-        var gameBoard = Array(size - 1);
-        for (let i = 0; i < size - 1; i++) {
-            gameBoard[i] = Array(size - 1);
-            for (let j = 0; j < size - 1; j++) {
-                gameBoard[i][j] = 0;
-            }
+    
+    // Create the board
+    var gameBoard = Array(size - 1);
+    for (let i = 0; i < size - 1; i++) {
+        gameBoard[i] = Array(size - 1);
+        for (let j = 0; j < size - 1; j++) {
+            gameBoard[i][j] = 0;
         }
-
-        var uiBoard = Array(size - 1);
-        for (let i = 0; i < size - 1; i++) {
-            uiBoard[i] = Array(size - 1);
-        }
-
-        
+    }
+    
     useEffect(() => {
         
         if (MySocket.isConnected()) {
@@ -55,7 +50,7 @@ function DotGame() {
                 gameBoard = data.board;
                 upDateCanvas();
             });
-
+            
             MySocket.getSocket().off("dot-game-move");
             MySocket.getSocket().on("dot-game-move", () => {
                 console.log("Your move");
@@ -65,7 +60,7 @@ function DotGame() {
             MySocket.getSocket().on("dot-game-over", (data) => {
                 alert(data.reason);
             });
-
+            
             MySocket.getSocket().off("dot-game-stop");
             MySocket.getSocket().on("dot-game-stop", (data) => {
                 console.log(data);
@@ -78,6 +73,9 @@ function DotGame() {
                 }
             });
         }
+
+        resetUI();
+        resetCanvas();
         
         return () => {
             if (MySocket.getSocket() && MySocket.getSocket().connected) {
@@ -89,7 +87,7 @@ function DotGame() {
             }
         }
     }, []);
-
+    
     // Clear canvas and draw the grid
     const resetCanvas = () => {
         let canvas = canvasRef.current;
@@ -109,9 +107,9 @@ function DotGame() {
         context.strokeStyle = '#dddddd';
         context.stroke();
     }
-
+    
     const upDateCanvas = () => {
-          // Fill in a single square (or triangle) appropriately
+        // Fill in a single square (or triangle) appropriately
         const fillSquare = (context, row, col, player, color) => {
             // If 3 corners are present, draw a triangle
             const drawTriangle = (context, coords1, coords2, coords3) => {
@@ -125,12 +123,12 @@ function DotGame() {
                 context.stroke();
                 context.fill();
             }
-
+            
             let topLeft = gameBoard[row][col];
             let topRight = gameBoard[row][col + 1];
             let bottomRight = gameBoard[row + 1][col + 1];
             let bottomLeft = gameBoard[row + 1][col];
-
+            
             // How many corners of this dot belong to the player
             let total = 0;
             if (topLeft === player) { total += 1 };
@@ -162,7 +160,7 @@ function DotGame() {
                 }
             }
         }
-
+        
         // Set each corner to the appropriate color
         for (let i = 0; i < size - 1; i++) {
             for (let j = 0; j < size - 1; j++) {
@@ -182,13 +180,13 @@ function DotGame() {
             }
         }
     }
-
+    
     // Reset (or set up) the UI
     function resetUI() {
         function clicked(x, y) {
             MySocket.getSocket().emit("dot-game-move", { x: x, y: y });
         }
-
+        
         function createClickableCircle(x, y, x_coords = 0, y_coords = 0) {
             let obj = document.createElement('input');
             obj.type = 'button';
@@ -200,11 +198,15 @@ function DotGame() {
             obj.onclick = () => clicked(x, y);
             return obj;
         }
-
+        
         let ui = uiDivRef.current;
+        while (ui.firstChild) {
+            ui.removeChild(ui.firstChild);
+        }
+        console.log(ui.removeChild);
         ui.style.width = size * scale + "px";
         ui.style.height = size * scale + "px";
-
+        
         // Make many buttons and make them clickable
         for (let i = 1; i < size; i++) {
             for (let j = 1; j < size; j++) {

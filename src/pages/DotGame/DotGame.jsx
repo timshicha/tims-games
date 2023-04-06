@@ -4,21 +4,26 @@ import { findPathAndMatrix } from './path-alg';
 import MySocket from '../../socket';
 import GrayButton from "../../components/GrayButton/GrayButton";
 
+const DEFAULT_SCALE = 20;
+
 function DotGame() {
     
     // How many pixels each box should be
-    let scale = 35;
+    const scale = 30;
     // How many boxes there should be
-    let size = 20;
+    let size = 18;
     // How big the circles should be
     let circleSize = scale;
+    const gameDivRef = useRef(null);
     const canvasRef = useRef(null);
     const uiDivRef = useRef(null);
+    const scaleSliderRef = useRef(null);
     const [searchGameText, setSearchGameText] = useState("");
     const [searching, setSearching] = useState(false);
     const [playerTerritory, setPlayerTerritory] = useState(0);
     const [uiBoard, setUiBoard] = useState(Array(size - 1).fill().map(() => Array(size - 1).fill()));
     var maxTerritory = (size - 2) * (size - 2);
+    const [leftSidebarExpanded, setLeftSidebarExpanded] = useState(false);
     
     // Create the board
     var gameBoard = Array(size - 1);
@@ -76,6 +81,7 @@ function DotGame() {
 
         resetUI();
         resetCanvas();
+        adjustSlider();
         
         return () => {
             if (MySocket.getSocket() && MySocket.getSocket().connected) {
@@ -92,7 +98,7 @@ function DotGame() {
     const resetCanvas = () => {
         let canvas = canvasRef.current;
         let context = canvas.getContext('2d');
-        context.clearRect(0, 0, size * scale, size * scale);
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
         context.beginPath();
         // Draw horizontal lines
         for (let i = 1; i < size; i++) {
@@ -182,7 +188,7 @@ function DotGame() {
     }
     
     // Reset (or set up) the UI
-    function resetUI() {
+    const resetUI = () => {
         function clicked(x, y) {
             MySocket.getSocket().emit("dot-game-move", { x: x, y: y });
         }
@@ -217,7 +223,7 @@ function DotGame() {
         }
     }
 
-    function searchGame() {
+    const searchGame = () => {
         if (!MySocket.isConnected()) {
             console.log("You are not connected.");
             return;
@@ -236,26 +242,56 @@ function DotGame() {
         }
     }
 
+    const toggleLeftSidebar = () => {
+        setLeftSidebarExpanded(!leftSidebarExpanded);
+    }
+
+    const calculateDefaultBoardSize = () => {
+        return window.innerHeight / (scale * size) * 0.9;
+    }
+
+    const adjustSlider = () => {
+        let newScale = scaleSliderRef.current.value;
+
+        let defaultScale = window.innerHeight / (scale * size) * 0.9;
+        gameDivRef.current.style.transform = "scale(" + (newScale) + ")";
+
+        // setScale(newScale);
+        // resetUI(newScale);
+        // resetCanvas(newScale);
+    }
+
     return (
         <>
             <div className="dot-game-page">
-                <GrayButton onClick={() => { resetCanvas(); resetUI(); }}>Setup</GrayButton>
-                    <p>You can win in the following ways:</p>
-                <ul>
-                    <li>Control 20% of the territory first (your current territory: {Math.round(playerTerritory * 100 / maxTerritory * 100) / 100}%)</li>
-                    <li>Control 20 more units than your opponent (you control: {playerTerritory})</li>
-                    <li>Control more territory once all dots have been filled</li>
-                </ul>
-                <div className="dot-game-title-div">
-                    <h1>Dot Game</h1>
-                    <p className="search-game-text">{searchGameText}</p>
-                    <GrayButton className="search-game-button" onClick={searchGame}>{searching ? "Cancel search" : "Search for opponent"}</GrayButton>
+                <div className={"games-page-container " + (leftSidebarExpanded ? "expanded" : "")}>
+                    <div className="games-page-scroll-area">
+                        <div className="left-sidebar-div">
+
+                        </div>
+
+                    </div>
+                    <div className="games-page-game-container">
+                        <div className="info-area">
+                            <GrayButton onClick={() => { resetCanvas(); resetUI(); }}>Setup</GrayButton>
+                            <GrayButton onClick={() => { toggleLeftSidebar() }}>Toggle Sidebar</GrayButton>
+                                <p>You can win in the following ways:</p>
+                            <ul>
+                                <li>Control 20% of the territory first (your current territory: {Math.round(playerTerritory * 100 / maxTerritory * 100) / 100}%)</li>
+                                <li>Control 20 more units than your opponent (you control: {playerTerritory})</li>
+                                <li>Control more territory once all dots have been filled</li>
+                            </ul>
+                            <p className="search-game-text">{searchGameText}</p>
+                            <GrayButton className="search-game-button" onClick={searchGame}>{searching ? "Cancel search" : "Search for opponent"}</GrayButton>
+                            <input type="range" min="0.2" max="2" step="0.01" defaultValue={calculateDefaultBoardSize().toString()} ref={scaleSliderRef} onChange={adjustSlider}></input>
+
+                        </div>
+                        <div className="g-area" ref={gameDivRef}>
+                            <div className="g-div" ref={uiDivRef}></div>
+                            <canvas className='g-canvas' ref={canvasRef} width={scale * size} height={scale * size}/>
+                        </div>
+                    </div>
                 </div>
-                <div className="g-area">
-                    <canvas width={scale * size} height={scale * size} className='g-canvas' ref={canvasRef} />
-                    <div className="g-div" ref={uiDivRef}></div>
-                </div>
-                
             </div>
             
         </>

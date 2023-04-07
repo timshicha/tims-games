@@ -8,18 +8,38 @@ const ProgressBar = (props) => {
     const [value, setValue] = useState(props.value || "50");
     const [max, setMax] = useState(props.max || "100");
 
+    const [totalWidth, setTotalWidth] = useState("40px");
+
     const calcFillWidth = () => {
-        let width = parseFloat(props.width || "100");
-        let value = parseFloat(props.value || "50");
+        let width = totalBarRef.current.clientWidth;
+        let value = 50;
+        if (props.value !== undefined) {
+            value = parseFloat(props.value);
+        }
+        console.log("value:", value, props.max);
         let max = parseFloat(props.max || "100");
         let fillWidth = value / max * width;
-        console.log("Fill:", fillWidth);
-        return fillWidth;
+        return fillWidth + "px";
     }
 
+    useEffect(() => {
+        let resizeEvents = window.addEventListener("resize", () => {
+            setTotalWidth(calcFillWidth);
+        });
+        setTotalWidth(calcFillWidth);
+
+        return () => {
+            window.removeEventListener("resize", resizeEvents);
+        }
+    }, []);
+
+    useEffect(() => {
+        setTotalWidth(calcFillWidth());
+    }, [props.value]);
+
     return (
-        <div className="progress-bar-background" style={{height: "40px", background: props.bgcolor || "gray", width: parseFloat(props.width || "100")}} ref={totalBarRef}>
-            <div className="progress-bar-fill" style={{ width: calcFillWidth(), background: props.color || "blue"}} ref={progressRef}></div>
+        <div className="progress-bar-background" style={{height: (props.height || "40px"), background: props.bgcolor || "gray", width: props.width || "100px"}} ref={totalBarRef}>
+            <div className="progress-bar-fill" style={{ width: totalWidth, background: props.color || "blue", transition: props.transition || "width 0.5s"}} ref={progressRef}></div>
         </div>
     );
 }

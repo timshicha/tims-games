@@ -7,5 +7,4 @@
 .progress-bar-fill {
     position: absolute;
     height: 100%;
-    transition: width 0.5s;
 }

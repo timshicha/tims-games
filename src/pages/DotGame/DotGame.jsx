@@ -5,6 +5,7 @@ import MySocket from '../../socket';
 import GrayButton from "../../components/GrayButton/GrayButton";
 import ProgressBar from "../../components/ProgressBar/ProgressBar";
 
+const MAX_TIME_TO_MOVE = 5000;
 const DEFAULT_SCALE = 20;
 const COLOR1 = "#0000FF";
 const COLOR2 = "#00FF00";
@@ -15,6 +16,8 @@ const IDLE = "Search for opponent";
 const SEARCHING = "Cancel search";
 const IN_GAME = "Forfeit game";
 const AFTER_GAME = "Play again";
+
+let toggle = 0;
 
 function DotGame() {
     
@@ -32,12 +35,15 @@ function DotGame() {
     const [searchGameText, setSearchGameText] = useState("");
     const [playerState, setPlayerState] = useState(IDLE);
     const [uiBoard, setUiBoard] = useState(Array(size - 1).fill().map(() => Array(size - 1).fill()));
+    const [youMove, setYouMove] = useState(false);
     const [leftSidebarExpanded, setLeftSidebarExpanded] = useState(false);
     const [player, setPlayer] = useState(1);
     const [youArea, setYouArea] = useState(0);
     const [opponentArea, setOpponentArea] = useState(0);
     const [youPercentage, setYouPercentage] = useState(0);
     const [opponentPercentage, setOpponentPercentage] = useState(0);
+    const [timeLeft, setTimeLeft] = useState(0);
+    const [countdownIDs, setCountdownIDs] = useState([]);
     
     // Create the board
     var gameBoard = Array(size - 1);
@@ -87,13 +93,19 @@ function DotGame() {
             });
             
             MySocket.getSocket().off("dot-game-move");
-            MySocket.getSocket().on("dot-game-move", () => {
-                console.log("Your move");
+            MySocket.getSocket().on("dot-game-move", (data) => {
+                startCountDown();
+                setYouMove(true);
+            });
+
+            MySocket.getSocket().off("dot-game-opponent-move");
+            MySocket.getSocket().on("dot-game-opponent-move", (data) => {
+                setYouMove(false);
             });
 
             MySocket.getSocket().off("dot-game-over");
             MySocket.getSocket().on("dot-game-over", (data) => {
-                alert(data.reason);
+                setSearchGameText(data.reason);
                 setPlayerState(AFTER_GAME);
             });
             
@@ -111,17 +123,50 @@ function DotGame() {
         }
 
         newGameSetup();
+
+        const adjustBoardSize = () => {
+            // Get height of area
+            let maxHeight = window.innerHeight - 220;
+            let maxWidth = window.innerWidth;
+            let length = Math.min(maxHeight, maxWidth) * 0.95;
+            let scale = length / 545;
+    
+            gameDivRef.current.style.transform = "scale(" + scale + ")";
+            gameDivRef.current.style.left = "calc(50vw - 14px - " + length / 2 + "px)";
+        }
+        adjustBoardSize();
+
+        let resizeEvents = window.addEventListener("resize", () => {
+            adjustBoardSize();
+        });
         
         return () => {
             if (MySocket.getSocket() && MySocket.getSocket().connected) {
+                MySocket.getSocket().emit("dot-game-stop");
                 MySocket.getSocket().off("dot-game-move");
+                MySocket.getSocket().off("dot-game-opponent-move");
                 MySocket.getSocket().off("dot-game-start");
                 MySocket.getSocket().off("dot-game-stop");
                 MySocket.getSocket().off("dot-game-over");
                 MySocket.getSocket().off("dot-game-update");
+                window.removeEventListener("resize", resizeEvents);
             }
         }
     }, []);
+
+    const startCountDown = () => {
+        stopCountDown();
+        for (let i = 0; i <= 5; i++) {
+            countdownIDs.push(setTimeout(() => setTimeLeft(5 - i), i * 1000));
+        }
+    }
+
+    const stopCountDown = () => {
+        for (let i = 0; i < countdownIDs.length; i++) {
+            clearTimeout(countdownIDs[i]);
+            setCountdownIDs([]);
+        }
+    }
     
     // Clear canvas and draw the grid
     const resetCanvas = () => {
@@ -272,6 +317,7 @@ function DotGame() {
         }
         // If the player is in game, forfeit
         else if (playerState === IN_GAME) {
+            MySocket.getSocket().emit("dot-game-forfeit");
             console.log("Forfeit");
         }
         // If the player finished a game, search again 
@@ -295,26 +341,26 @@ function DotGame() {
                     </div>
                     <div className="games-page-game-container">
                         <div className="info-area" ref={infoAreaRef}>
-                            <GrayButton onClick={() => { resetCanvas(); resetUI(); }}>Setup</GrayButton>
                             <GrayButton onClick={() => { toggleLeftSidebar() }}>Toggle Sidebar</GrayButton>
                             <GrayButton className="search-game-button" onClick={handleMainClick}>{playerState}</GrayButton>
-                            <p className="info-text-main-div">{searchGameText}</p>
+                            <p className="info-text-main">{searchGameText}</p>
                             <div className="info-stat-div">
                                 <p className="info-text-div right">{youArea}</p>
-                                <ProgressBar width="250" max="40" value={Math.min(Math.max(youArea - opponentArea, -20), 20) + 20 + ""} color={player === 1 ? COLOR1 : COLOR2} bgcolor={player === 1 ? COLOR2 : COLOR1} />
+                                <ProgressBar height="30px" width="40vw" max="40" value={Math.min(Math.max(youArea - opponentArea, -20), 20) + 20 + ""} color={player === 1 ? COLOR1 : COLOR2} bgcolor={player === 1 ? COLOR2 : COLOR1} />
                                 <p className="info-text-div">{opponentArea}</p>
 
                             </div>
                             <div className="info-stat-div">
                                 <p className="info-text-div right">{parseFloat(youPercentage).toFixed(1) + "%"}</p>
-                                <ProgressBar width="250" max="25" value={Math.min(youPercentage, 25) + ""} color={player === 1 ? COLOR1 : COLOR2} />
+                                <ProgressBar height="30px" width="40vw" max="25" value={Math.min(youPercentage, 25) + ""} color={player === 1 ? COLOR1 : COLOR2} />
                                 <p className="info-text-div"></p>
                             </div>
                             <div className="info-stat-div">
                                 <p className="info-text-div right">{parseFloat(opponentPercentage).toFixed(1) + "%"}</p>
-                                <ProgressBar width="250" max="25" value={Math.min(opponentPercentage, 25) + ""} color={player === 1 ? COLOR2 : COLOR1} />
+                                <ProgressBar height="30px" width="40vw" max="25" value={Math.min(opponentPercentage, 25) + ""} color={player === 1 ? COLOR2 : COLOR1} />
                                 <p className="info-text-div"></p>
                             </div>
+                            <p className="info-text-main">{playerState === IN_GAME ? (youMove ? ("Your turn: " + timeLeft): "Opponent's turn"): ""}</p>
 
                         </div>
                         <div className="g-area" ref={gameDivRef}>

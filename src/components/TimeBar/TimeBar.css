@@ -1,0 +1,17 @@
+
+.time-bar-background {
+    display: inline-block;
+    position: relative;
+}
+
+.time-bar-fill {
+    position: absolute;
+    height: 100%;
+    width: 0%;
+    transition: width 5s linear;
+}
+
+.time-bar-fill.full {
+    width: 100%;
+    transition: none;
+}

@@ -3,8 +3,11 @@ import { useEffect, useState, useRef } from 'react';
 import { findPathAndMatrix } from './path-alg';
 import MySocket from '../../socket';
 import GrayButton from "../../components/GrayButton/GrayButton";
+import ProgressBar from "../../components/ProgressBar/ProgressBar";
 
 const DEFAULT_SCALE = 20;
+const COLOR1 = "#0000FF";
+const COLOR2 = "#00FF00";
 
 function DotGame() {
     
@@ -17,13 +20,19 @@ function DotGame() {
     const gameDivRef = useRef(null);
     const canvasRef = useRef(null);
     const uiDivRef = useRef(null);
-    const scaleSliderRef = useRef(null);
+    const infoAreaRef = useRef(null);
     const [searchGameText, setSearchGameText] = useState("");
     const [searching, setSearching] = useState(false);
     const [playerTerritory, setPlayerTerritory] = useState(0);
     const [uiBoard, setUiBoard] = useState(Array(size - 1).fill().map(() => Array(size - 1).fill()));
     var maxTerritory = (size - 2) * (size - 2);
     const [leftSidebarExpanded, setLeftSidebarExpanded] = useState(false);
+    const [player, setPlayer] = useState(1);
+    const [difference, setDifference] = useState(0);
+    const [youArea, setYouArea] = useState(0);
+    const [opponentArea, setOpponentArea] = useState(0);
+    const [youPercentage, setYouPercentage] = useState(0);
+    const [opponentPercentage, setOpponentPercentage] = useState(0);
     
     // Create the board
     var gameBoard = Array(size - 1);
@@ -43,6 +52,7 @@ function DotGame() {
                 if (!data.success) {
                     return;
                 }
+                setPlayer(data.you);
                 setSearchGameText("Game against " + data.opponent + ".");
             });
             
@@ -53,6 +63,10 @@ function DotGame() {
                 }
                 console.log("Data:", data);
                 gameBoard = data.board;
+                setYouArea(data.area.you);
+                setOpponentArea(data.area.opponent);
+                setYouPercentage(data.areaPercent.you);
+                setOpponentPercentage(data.areaPercent.opponent);
                 upDateCanvas();
             });
             
@@ -79,9 +93,9 @@ function DotGame() {
             });
         }
 
-        resetUI();
         resetCanvas();
-        adjustSlider();
+        upDateCanvas();
+        resetUI();
         
         return () => {
             if (MySocket.getSocket() && MySocket.getSocket().connected) {
@@ -181,8 +195,8 @@ function DotGame() {
         let context = canvasRef.current.getContext('2d');
         for (let i = 0; i < size - 2; i++) {
             for (let j = 0; j < size - 2; j++) {
-                fillSquare(context, i, j, -1, "#00ff00");
-                fillSquare(context, i, j, 1, "#0000ff");
+                fillSquare(context, i, j, -1, COLOR2);
+                fillSquare(context, i, j, 1, COLOR1);
             }
         }
     }
@@ -246,48 +260,41 @@ function DotGame() {
         setLeftSidebarExpanded(!leftSidebarExpanded);
     }
 
-    const calculateDefaultBoardSize = () => {
-        return window.innerHeight / (scale * size) * 0.9;
-    }
-
-    const adjustSlider = () => {
-        let newScale = scaleSliderRef.current.value;
-
-        let defaultScale = window.innerHeight / (scale * size) * 0.9;
-        gameDivRef.current.style.transform = "scale(" + (newScale) + ")";
-
-        // setScale(newScale);
-        // resetUI(newScale);
-        // resetCanvas(newScale);
-    }
-
     return (
         <>
             <div className="dot-game-page">
                 <div className={"games-page-container " + (leftSidebarExpanded ? "expanded" : "")}>
                     <div className="games-page-scroll-area">
                         <div className="left-sidebar-div">
-
                         </div>
-
                     </div>
                     <div className="games-page-game-container">
-                        <div className="info-area">
+                        <div className="info-area" ref={infoAreaRef}>
+                            <div className="info-stat-div">
+                                <p className="info-text-div right">{youArea}</p>
+                                <ProgressBar width="250" max="40" value={Math.min(Math.max(youArea - opponentArea, -20), 20) + 20 + ""} color={player === 1 ? COLOR1 : COLOR2} bgcolor={player === 1 ? COLOR2 : COLOR1} />
+                                <p className="info-text-div">{opponentArea}</p>
+
+                            </div>
+                            <div className="info-stat-div">
+                                <p className="info-text-div right">{parseFloat(youPercentage).toFixed(1) + "%"}</p>
+                                <ProgressBar width="250" max="25" value={Math.min(youPercentage, 25) + ""} color={player === 1 ? COLOR1 : COLOR2} />
+                                <p className="info-text-div"></p>
+                            </div>
+                            <div className="info-stat-div">
+                                <p className="info-text-div right">{parseFloat(opponentPercentage).toFixed(1) + "%"}</p>
+                                <ProgressBar width="250" max="25" value={Math.min(opponentPercentage, 25) + ""} color={player === 1 ? COLOR2 : COLOR1} />
+                                <p className="info-text-div"></p>
+                            </div>
                             <GrayButton onClick={() => { resetCanvas(); resetUI(); }}>Setup</GrayButton>
                             <GrayButton onClick={() => { toggleLeftSidebar() }}>Toggle Sidebar</GrayButton>
-                                <p>You can win in the following ways:</p>
-                            <ul>
-                                <li>Control 20% of the territory first (your current territory: {Math.round(playerTerritory * 100 / maxTerritory * 100) / 100}%)</li>
-                                <li>Control 20 more units than your opponent (you control: {playerTerritory})</li>
-                                <li>Control more territory once all dots have been filled</li>
-                            </ul>
-                            <p className="search-game-text">{searchGameText}</p>
                             <GrayButton className="search-game-button" onClick={searchGame}>{searching ? "Cancel search" : "Search for opponent"}</GrayButton>
-                            <input type="range" min="0.2" max="2" step="0.01" defaultValue={calculateDefaultBoardSize().toString()} ref={scaleSliderRef} onChange={adjustSlider}></input>
+                            <p className="search-game-text">{searchGameText}</p>
+                            {/* <input type="range" min="0.2" max="2" step="0.01" defaultValue={calculateDefaultBoardSize().toString()} ref={scaleSliderRef}></input> */}
 
                         </div>
                         <div className="g-area" ref={gameDivRef}>
-                            <div className="g-div" ref={uiDivRef}></div>
+                            <div className="g-div" ref={uiDivRef} style={{borderColor: (player === 1 ? COLOR1 : COLOR2)}}></div>
                             <canvas className='g-canvas' ref={canvasRef} width={scale * size} height={scale * size}/>
                         </div>
                     </div>

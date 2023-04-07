@@ -1,5 +1,6 @@
 import React from 'react';
 import "./components/GrayButton/GrayButton.css";
+import "./components/ProgressBar/ProgressBar.css";
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';

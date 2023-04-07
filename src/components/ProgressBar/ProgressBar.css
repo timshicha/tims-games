@@ -1,0 +1,11 @@
+
+.progress-bar-background {
+    display: inline-block;
+    position: relative;
+}
+
+.progress-bar-fill {
+    position: absolute;
+    height: 100%;
+    transition: width 0.5s;
+}

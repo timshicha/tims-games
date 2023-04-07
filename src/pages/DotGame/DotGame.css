@@ -3,7 +3,7 @@
     position: absolute;
     width: 100vw;
     height: 100vh;
-    background-color: orange;
+    background-color: rgb(113, 113, 113);
     overflow: hidden;
 }
 
@@ -58,30 +58,37 @@
     background-image: url('../../assets/DotGame/circleGreen.svg');
 }
 
+.games-page-scroll-area {
+    grid-area: scroll-area;
+    background-color: green;
+    height: 100vh;
+}
+
+.info-area {
+    background-color: rgb(81, 81, 81);
+    height: 300px;
+}
+
 .g-area {
+    margin-left: auto;
+    margin-right: auto;
+    height: 600px;
     grid-area: board-area;
     position: relative;
     transform-origin: top left;
-    /* background-color: red; */
-    /* height: 100vh; */
     padding: 15px;
-    /* padding-bottom: 25px; */
     width: fit-content;
-    /* overflow-y: auto; */
+    overflow: auto;
 }
 
 .g-canvas {
-    /* position: absolute; */
-    border: 1px solid black;
-    /* overflow: scroll; */
-    /* background-color: yellow; */
-    /* opacity: 0.4; */
+    border: 3px solid transparent;
     pointer-events: none;
 }
 
 .g-div {
     position: absolute;
-    border: black solid 1px;
+    border: 3px solid;
     z-index: 10;
 }
 
@@ -91,35 +98,30 @@
     grid-template-areas:
     "scroll-area play-area";
     transition: 0.3s;
-    /* overflow-y: auto; */
 }
-
 .games-page-container.expanded {
-    display: grid;
-	grid-template-columns: 300px auto;
-	grid-template-areas:
-    "scroll-area play-area";
-}
-.games-page-scroll-area {
-    grid-area: scroll-area;
-    background-color: green;
-    /* overflow-y: auto; */
-    height: 100vh;
-}
-
-.info-area {
-    grid-area: info-area;
-    background-color: red;
-}
-
-.games-page-game-container {
-    grid-area: play-area;
-    display: grid;
-    height: 100vh;
-    width: 100%;
-    overflow-y: auto;
-    /* overflow-x: auto; */
     grid-template-columns: 300px auto;
-    grid-template-areas:
-    "info-area board-area";
+}
+
+.info-stat-div {
+    display: block;
+    text-align: center;
+}
+
+.info-text-div {
+    color: white;
+    position: relative;
+    display: inline-block;
+    width: 100px;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0px;
+    bottom: 10px;
+    margin-right: 10px;
+    margin-left: 10px;
+    text-align: left;
+}
+.info-text-div.right {
+    text-align: right;
 }

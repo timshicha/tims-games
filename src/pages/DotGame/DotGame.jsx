@@ -9,6 +9,13 @@ const DEFAULT_SCALE = 20;
 const COLOR1 = "#0000FF";
 const COLOR2 = "#00FF00";
 
+// Depending on the current state of the player, one of the following
+// will be the text of the button.
+const IDLE = "Search for opponent";
+const SEARCHING = "Cancel search";
+const IN_GAME = "Forfeit game";
+const AFTER_GAME = "Play again";
+
 function DotGame() {
     
     // How many pixels each box should be
@@ -21,14 +28,12 @@ function DotGame() {
     const canvasRef = useRef(null);
     const uiDivRef = useRef(null);
     const infoAreaRef = useRef(null);
+
     const [searchGameText, setSearchGameText] = useState("");
-    const [searching, setSearching] = useState(false);
-    const [playerTerritory, setPlayerTerritory] = useState(0);
+    const [playerState, setPlayerState] = useState(IDLE);
     const [uiBoard, setUiBoard] = useState(Array(size - 1).fill().map(() => Array(size - 1).fill()));
-    var maxTerritory = (size - 2) * (size - 2);
     const [leftSidebarExpanded, setLeftSidebarExpanded] = useState(false);
     const [player, setPlayer] = useState(1);
-    const [difference, setDifference] = useState(0);
     const [youArea, setYouArea] = useState(0);
     const [opponentArea, setOpponentArea] = useState(0);
     const [youPercentage, setYouPercentage] = useState(0);
@@ -42,6 +47,15 @@ function DotGame() {
             gameBoard[i][j] = 0;
         }
     }
+
+    const newGameSetup = () => {
+        resetCanvas();
+        resetUI();
+        setYouArea(0);
+        setOpponentArea(0);
+        setYouPercentage(0);
+        setOpponentPercentage(0);
+    }
     
     useEffect(() => {
         
@@ -52,7 +66,9 @@ function DotGame() {
                 if (!data.success) {
                     return;
                 }
+                newGameSetup();
                 setPlayer(data.you);
+                setPlayerState(IN_GAME);
                 setSearchGameText("Game against " + data.opponent + ".");
             });
             
@@ -78,13 +94,14 @@ function DotGame() {
             MySocket.getSocket().off("dot-game-over");
             MySocket.getSocket().on("dot-game-over", (data) => {
                 alert(data.reason);
+                setPlayerState(AFTER_GAME);
             });
             
             MySocket.getSocket().off("dot-game-stop");
             MySocket.getSocket().on("dot-game-stop", (data) => {
                 console.log(data);
                 if (data.success) {
-                    setSearching(false);
+                    setPlayerState(IDLE);
                     setSearchGameText("");
                 }
                 else {
@@ -93,9 +110,7 @@ function DotGame() {
             });
         }
 
-        resetCanvas();
-        upDateCanvas();
-        resetUI();
+        newGameSetup();
         
         return () => {
             if (MySocket.getSocket() && MySocket.getSocket().connected) {
@@ -237,22 +252,32 @@ function DotGame() {
         }
     }
 
-    const searchGame = () => {
+    // Do something based on the player's state
+    const handleMainClick = () => {
+        // Make sure the player is connected
         if (!MySocket.isConnected()) {
             console.log("You are not connected.");
             return;
         }
-        // Start searching
-        if (!searching) {
-            console.log("Starting search");
-            setSearching(true);
-            setSearchGameText("Searching for opponent...");
-            MySocket.getSocket().emit("dot-game-start", {playWith: null});
+        // If the player is idle, search for a game
+        if (playerState === IDLE) {
+            console.log("Searching.");
+            setPlayerState(SEARCHING);
+            MySocket.getSocket().emit("dot-game-start", { playWith: null });
         }
-        // Stop searching
-        else {
-            console.log("Stopping search");
+        // If the player is searchimg, attepmt to stop the search
+        else if (playerState === SEARCHING) {
+            console.log("Stopping.");
             MySocket.getSocket().emit("dot-game-stop");
+        }
+        // If the player is in game, forfeit
+        else if (playerState === IN_GAME) {
+            console.log("Forfeit");
+        }
+        // If the player finished a game, search again 
+        else {
+            setPlayerState(SEARCHING);
+            MySocket.getSocket().emit("dot-game-start", { playWith: null });
         }
     }
 
@@ -270,6 +295,10 @@ function DotGame() {
                     </div>
                     <div className="games-page-game-container">
                         <div className="info-area" ref={infoAreaRef}>
+                            <GrayButton onClick={() => { resetCanvas(); resetUI(); }}>Setup</GrayButton>
+                            <GrayButton onClick={() => { toggleLeftSidebar() }}>Toggle Sidebar</GrayButton>
+                            <GrayButton className="search-game-button" onClick={handleMainClick}>{playerState}</GrayButton>
+                            <p className="info-text-main-div">{searchGameText}</p>
                             <div className="info-stat-div">
                                 <p className="info-text-div right">{youArea}</p>
                                 <ProgressBar width="250" max="40" value={Math.min(Math.max(youArea - opponentArea, -20), 20) + 20 + ""} color={player === 1 ? COLOR1 : COLOR2} bgcolor={player === 1 ? COLOR2 : COLOR1} />
@@ -286,11 +315,6 @@ function DotGame() {
                                 <ProgressBar width="250" max="25" value={Math.min(opponentPercentage, 25) + ""} color={player === 1 ? COLOR2 : COLOR1} />
                                 <p className="info-text-div"></p>
                             </div>
-                            <GrayButton onClick={() => { resetCanvas(); resetUI(); }}>Setup</GrayButton>
-                            <GrayButton onClick={() => { toggleLeftSidebar() }}>Toggle Sidebar</GrayButton>
-                            <GrayButton className="search-game-button" onClick={searchGame}>{searching ? "Cancel search" : "Search for opponent"}</GrayButton>
-                            <p className="search-game-text">{searchGameText}</p>
-                            {/* <input type="range" min="0.2" max="2" step="0.01" defaultValue={calculateDefaultBoardSize().toString()} ref={scaleSliderRef}></input> */}
 
                         </div>
                         <div className="g-area" ref={gameDivRef}>

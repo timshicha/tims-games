@@ -40,8 +40,6 @@ function DotGame() {
     const [player, setPlayer] = useState(1);
     const [youArea, setYouArea] = useState(0);
     const [opponentArea, setOpponentArea] = useState(0);
-    const [youPercentage, setYouPercentage] = useState(0);
-    const [opponentPercentage, setOpponentPercentage] = useState(0);
     const [timeLeft, setTimeLeft] = useState(0);
     const [countdownIDs, setCountdownIDs] = useState([]);
     
@@ -59,8 +57,6 @@ function DotGame() {
         resetUI();
         setYouArea(0);
         setOpponentArea(0);
-        setYouPercentage(0);
-        setOpponentPercentage(0);
     }
     
     useEffect(() => {
@@ -87,8 +83,6 @@ function DotGame() {
                 gameBoard = data.board;
                 setYouArea(data.area.you);
                 setOpponentArea(data.area.opponent);
-                setYouPercentage(data.areaPercent.you);
-                setOpponentPercentage(data.areaPercent.opponent);
                 upDateCanvas();
             });
             
@@ -349,16 +343,6 @@ function DotGame() {
                                 <ProgressBar height="30px" width="40vw" max="40" value={Math.min(Math.max(youArea - opponentArea, -20), 20) + 20 + ""} color={player === 1 ? COLOR1 : COLOR2} bgcolor={player === 1 ? COLOR2 : COLOR1} />
                                 <p className="info-text-div">{opponentArea}</p>
 
-                            </div>
-                            <div className="info-stat-div">
-                                <p className="info-text-div right">{parseFloat(youPercentage).toFixed(1) + "%"}</p>
-                                <ProgressBar height="30px" width="40vw" max="25" value={Math.min(youPercentage, 25) + ""} color={player === 1 ? COLOR1 : COLOR2} />
-                                <p className="info-text-div"></p>
-                            </div>
-                            <div className="info-stat-div">
-                                <p className="info-text-div right">{parseFloat(opponentPercentage).toFixed(1) + "%"}</p>
-                                <ProgressBar height="30px" width="40vw" max="25" value={Math.min(opponentPercentage, 25) + ""} color={player === 1 ? COLOR2 : COLOR1} />
-                                <p className="info-text-div"></p>
                             </div>
                             <p className="info-text-main">{playerState === IN_GAME ? (youMove ? ("Your turn: " + timeLeft): "Opponent's turn"): ""}</p>
 

@@ -1,5 +1,5 @@
 import './DotGame.css';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { findPathAndMatrix } from './path-alg';
 import MySocket from '../../socket';
 import GrayButton from "../../components/GrayButton/GrayButton";
@@ -58,6 +58,17 @@ function DotGame() {
         setYouArea(0);
         setOpponentArea(0);
     }
+    
+    const adjustBoardSize = useCallback(() => {
+        // Get height of area
+        let maxHeight = window.innerHeight - 220;
+        let maxWidth = window.innerWidth;
+        let length = Math.min(maxHeight, maxWidth) * 0.95;
+        let scale = length / 545;
+
+        gameDivRef.current.style.transform = "scale(" + scale + ")";
+        gameDivRef.current.style.left = "calc(50vw - 14px - " + length / 2 + "px)";
+    });
     
     useEffect(() => {
         
@@ -128,23 +139,19 @@ function DotGame() {
             gameDivRef.current.style.transform = "scale(" + scale + ")";
             gameDivRef.current.style.left = "calc(50vw - 14px - " + length / 2 + "px)";
         }
-        adjustBoardSize();
+        // adjustBoardSize();
 
-        let resizeEvents = window.addEventListener("resize", () => {
-            adjustBoardSize();
-        });
+        window.addEventListener("resize", adjustBoardSize, true);
         
         return () => {
-            if (MySocket.getSocket() && MySocket.getSocket().connected) {
-                MySocket.getSocket().emit("dot-game-stop");
-                MySocket.getSocket().off("dot-game-move");
-                MySocket.getSocket().off("dot-game-opponent-move");
-                MySocket.getSocket().off("dot-game-start");
-                MySocket.getSocket().off("dot-game-stop");
-                MySocket.getSocket().off("dot-game-over");
-                MySocket.getSocket().off("dot-game-update");
-                window.removeEventListener("resize", resizeEvents);
-            }
+            MySocket.getSocket().emit("dot-game-stop");
+            MySocket.getSocket().off("dot-game-move");
+            MySocket.getSocket().off("dot-game-opponent-move");
+            MySocket.getSocket().off("dot-game-start");
+            MySocket.getSocket().off("dot-game-stop");
+            MySocket.getSocket().off("dot-game-over");
+            MySocket.getSocket().off("dot-game-update");
+            window.removeEventListener("resize", adjustBoardSize, true);
         }
     }, []);
 
